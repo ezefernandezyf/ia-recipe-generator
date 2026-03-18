@@ -19,3 +19,41 @@ Usaremos **Spec-Driven Development (SDD)**.
 - **Tipado estricto**: No uses `any`. Define interfaces para cada ingrediente y receta.
 - **Memoria**: Registra cada decisión arquitectónica importante (ej. por qué elegimos Zustand o Context) usando el MCP de **Engram**.
 - **Revisión**: Cada cambio debe ser validado por el **Gentleman Guardian Angel (GGA)**.
+
+## 5. Contexto Operativo del Workspace (Bootstrap)
+
+## Build y Test
+- Proyecto activo detectado: `recipe-generator-prd/`.
+- Instalar dependencias: `npm install` (en `recipe-generator-prd/`).
+- Desarrollo: `npm start`.
+- Build de producción: `npm run build`.
+- Preview de build: `npm run serve`.
+
+## Arquitectura Actual
+- Frontend con Vite + React + TypeScript en `recipe-generator-prd/src/`.
+- Enrutado central en `recipe-generator-prd/src/app.tsx`.
+- Especificación funcional inicial en `recipe-generator-prd/docs/specs/recipe_gen_prd.md`.
+
+## Convenciones de Implementación
+- Seguir SDD: explorar/especificar antes de implementar.
+- Mantener separación clara entre tipos, componentes y estado compartido.
+- No introducir `any`; preferir interfaces y enums explícitos.
+
+## Pitfalls Detectados (resolver antes de feature work)
+- `README.md` indica `npm run dev`, pero `package.json` define `npm start`.
+- `recipe-generator-prd/src/app.tsx` usa `react-router-dom` y `RecipeContext`, pero faltan dependencias/archivos asociados.
+- `recipe-generator-prd/vite.config.ts` usa `@vitejs/plugin-react`, pero no figura en `devDependencies`.
+
+## Archivos Clave
+- `AGENTS.md`
+- `recipe-generator-prd/docs/specs/recipe_gen_prd.md`
+- `recipe-generator-prd/package.json`
+- `recipe-generator-prd/src/app.tsx`
+- `recipe-generator-prd/vite.config.ts`
+
+## Skills Registradas
+- **React 19**: ./skills/react-19/SKILL.md
+- **TypeScript**: ./skills/typescript/SKILL.md
+- **Tailwind 4**: ./skills/tailwind-4/SKILL.md
+- **skill creator**: ./skills/skill-creator/SKILL.md
+- **recipe-prd-architect**: ./.github/skills/recipe-prd-architect/SKILL.md
