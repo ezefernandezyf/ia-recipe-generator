@@ -46,7 +46,10 @@ Usaremos **Spec-Driven Development (SDD)**.
 
 - Seguir SDD: explorar/especificar antes de implementar.
 - Mantener separación clara entre tipos, componentes y estado compartido.
-- No introducir `any`; preferir interfaces y enums explícitos.
+- No introducir `any`; preferir interfaces y enums explícitos. Tipado estrícto.
+- Tipado en React: Se permite el uso de ReactElement como tipo de retorno estándar para componentes funcionales. Solo exigir interfaces específicas si el componente devuelve props complejas de renderizado.
+- Uso de Partial: Se permite el uso de Partial<T> para parches de estado locales. Solo exigir interfaces dedicadas para modelos de datos del dominio o contratos de API.
+- Tipos unknown: Prohibido el uso de unknown en parámetros de funciones lógicas; deben tiparse explícitamente (ej: string | undefined para notas).
 
 ## Pitfalls Detectados (resolver antes de feature work)
 

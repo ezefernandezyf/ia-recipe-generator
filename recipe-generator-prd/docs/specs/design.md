@@ -55,4 +55,7 @@ Este diseño proporciona una base sólida para el desarrollo del generador de re
 ## 9. Nota de Decisiones (Hook Fixes)
 - Se tiparon explícitamente `AppRoutes`, `App`, `rootElement` y `root` para cumplir estilo estricto de TypeScript sin alterar comportamiento de runtime.
 - Se mantiene la frontera de routing en `src/AppRoutes.tsx` (y no embebida en `src/app.tsx`) para separar composición raíz de navegación, facilitar pruebas de rutas y conservar un punto único de evolución si aparecen nuevas pantallas.
-- Se mantiene `src/components/index.ts` como barrel legacy vacío por compatibilidad transicional con imports históricos del repo; el barrel activo y con ownership vigente es `src/features/recipe-generator/components/index.ts`, evitando mezclar exportaciones globales nuevas con una capa en deprecación.
+- `src/components/index.ts` fue eliminado; el barrel activo y con ownership vigente es `src/features/recipe-generator/components/index.ts`, evitando mantener una capa global de compatibilidad que ya no tiene consumidores.
+- El estado dueño de los ingredientes se modela como tupla no vacía para impedir que el formulario quede sin filas.
+- `quantity` y `servings` se representan con `null` mientras la entrada es inválida, para que la validación de submit bloquee la generación de forma explícita en vez de depender de coerción silenciosa.
+- Se mantienen alias de retorno legibles en los componentes principales para evitar la repetición de `React.JSX.Element` en las firmas.
