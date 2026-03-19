@@ -31,7 +31,7 @@ Project: IA-Recipe-Generator
   - Scope: project
   - Trigger: React 19 project patterns and implementation workflow
 - `recipe-prd-architect`
-  - Path: `C:/Users/ezefe/Desktop/IA-Recipe-Generator/recipe-generator-prd/.github/skills/recipe-prd-architect/SKILL.md`
+  - Path: `C:/Users/ezefe/Desktop/IA-Recipe-Generator/.github/skills/recipe-prd-architect/SKILL.md`
   - Scope: project
   - Trigger: Create/update recipe PRD with user flow, data model, and stack confirmation
 - `skill-creator`
@@ -48,9 +48,9 @@ Project: IA-Recipe-Generator
   - Trigger: TypeScript strict typing and project standards
 
 ## Project Convention Files
-- `recipe-generator-prd/AGENTS.md`
+- `AGENTS.md`
   - Type: project instruction index
-  - Referenced local files detected: `../skills/react-19/SKILL.md`, `../skills/typescript/SKILL.md`, `../skills/tailwind-4/SKILL.md`, `../skills/skill-creator/SKILL.md`, `./.github/skills/recipe-prd-architect/SKILL.md`
+  - Referenced local files detected: `./skills/react-19/SKILL.md`, `./skills/typescript/SKILL.md`, `./skills/tailwind-4/SKILL.md`, `./skills/skill-creator/SKILL.md`, `./.github/skills/recipe-prd-architect/SKILL.md`
 
 ## Exclusions Applied
 - Skipped skill folders matching: `sdd-*`, `_shared`, `skill-registry`

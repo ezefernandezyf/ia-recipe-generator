@@ -1,7 +1,5 @@
 # Recipe Generator PRD
 
-> Este es el README que GitHub renderiza automaticamente en la pagina principal del repositorio. Si queres cambiar lo que se ve en el repo, este es el archivo correcto.
-
 Aplicacion web para generar recetas personalizadas a partir de ingredientes y preferencias del usuario. El proyecto esta hecho con React 19, TypeScript y Tailwind CSS 4, y sigue un flujo de trabajo SDD con documentacion en `docs/specs/`.
 
 ## Que hace

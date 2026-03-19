@@ -30,17 +30,17 @@ Usaremos **Spec-Driven Development (SDD)**.
 
 ## Build y Test
 
-- Proyecto activo detectado: `recipe-generator-prd/`.
-- Instalar dependencias: `npm install` (en `recipe-generator-prd/`).
+- Proyecto activo detectado: raíz del repositorio.
+- Instalar dependencias: `npm install` (en la raíz del repo).
 - Desarrollo: `npm start`.
 - Build de producción: `npm run build`.
 - Preview de build: `npm run serve`.
 
 ## Arquitectura Actual
 
-- Frontend con Vite + React + TypeScript en `recipe-generator-prd/src/`.
-- Enrutado central en `recipe-generator-prd/src/app.tsx`.
-- Especificación funcional inicial en `recipe-generator-prd/docs/specs/recipe_gen_prd.md`.
+- Frontend con Vite + React + TypeScript en `src/`.
+- Enrutado central en `src/app.tsx` y `src/AppRoutes.tsx`.
+- Especificación funcional inicial en `docs/specs/recipe_gen_prd.md`.
 
 ## Convenciones de Implementación
 
@@ -53,24 +53,24 @@ Usaremos **Spec-Driven Development (SDD)**.
 
 ## Pitfalls Detectados (resolver antes de feature work)
 
-- `README.md` indica `npm run dev`, pero `package.json` define `npm start`.
-- `recipe-generator-prd/src/app.tsx` usa `react-router-dom` y `RecipeContext`, pero faltan dependencias/archivos asociados.
-- `recipe-generator-prd/vite.config.ts` usa `@vitejs/plugin-react`, pero no figura en `devDependencies`.
+- El README raíz es el que GitHub renderiza automáticamente en la página principal del repo.
+- Mantener alineados `README.md`, `package.json` y los scripts de Vite cuando cambie el flujo de ejecución.
 
 ## Archivos Clave
 
 - `AGENTS.md`
-- `recipe-generator-prd/docs/specs/recipe_gen_prd.md`
-- `recipe-generator-prd/package.json`
-- `recipe-generator-prd/src/app.tsx`
-- `recipe-generator-prd/vite.config.ts`
+- `docs/specs/recipe_gen_prd.md`
+- `package.json`
+- `src/app.tsx`
+- `src/AppRoutes.tsx`
+- `vite.config.mts`
 
 ## Skills Registradas
 
-- **React 19**: ../skills/react-19/SKILL.md
-- **TypeScript**: ../skills/typescript/SKILL.md
-- **Tailwind 4**: ../skills/tailwind-4/SKILL.md
-- **skill creator**: ../skills/skill-creator/SKILL.md
+- **React 19**: ./skills/react-19/SKILL.md
+- **TypeScript**: ./skills/typescript/SKILL.md
+- **Tailwind 4**: ./skills/tailwind-4/SKILL.md
+- **skill creator**: ./skills/skill-creator/SKILL.md
 - **recipe-prd-architect**: ./.github/skills/recipe-prd-architect/SKILL.md
 
 ## Protocolo de Carga de Skills por Tarea
