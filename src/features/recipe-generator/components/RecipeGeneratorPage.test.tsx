@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateRecipe } from '../services/ai';
 import RecipeGeneratorPage from './RecipeGeneratorPage';
 
@@ -9,6 +9,10 @@ vi.mock('../services/ai', () => ({
 }));
 
 describe('RecipeGeneratorPage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('submits ingredient data and renders generated recipe', async () => {
     const user = userEvent.setup();
     const generateRecipeMock = vi.mocked(generateRecipe);
@@ -76,6 +80,6 @@ describe('RecipeGeneratorPage', () => {
     await user.click(screen.getByRole('button', { name: 'Generar receta' }));
 
     expect(generateRecipeMock).not.toHaveBeenCalled();
-    expect(screen.getByText('Las porciones deben ser un número mayor que 0.')).toBeInTheDocument();
+    expect(screen.getByText('Revisá las porciones antes de generar la receta.')).toBeInTheDocument();
   });
 });

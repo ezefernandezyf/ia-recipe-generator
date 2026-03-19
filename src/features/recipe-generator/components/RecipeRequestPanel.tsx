@@ -28,18 +28,22 @@ const RecipeRequestPanel = ({
     const notesTextareaId = 'recipe-request-notes';
     const [servingsError, setServingsError] = useState<string | null>(null);
 
-    const handleServingsChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const rawValue = event.target.value.trim();
+    const syncServingsValue = (rawValue: string) => {
+        const trimmedValue = rawValue.trim();
 
-        if (!isValidServingsValue(rawValue)) {
+        if (!isValidServingsValue(trimmedValue)) {
             setServingsError('Ingresá un número de porciones mayor que 0.');
             onServingsChange(null);
             return;
         }
 
-        const parsed = Number(rawValue);
+        const parsed = Number(trimmedValue);
         setServingsError(null);
         onServingsChange(parsed);
+    };
+
+    const handleServingsChange = (event: ChangeEvent<HTMLInputElement>) => {
+        syncServingsValue(event.target.value);
     };
 
     const handleNotesChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -54,10 +58,14 @@ const RecipeRequestPanel = ({
                 <label htmlFor={servingsInputId} className="mb-1 block text-sm font-medium text-slate-700">Porciones</label>
                 <input
                     id={servingsInputId}
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    role="spinbutton"
                     min="1"
-                    value={servings ?? ''}
+                    defaultValue={servings ?? ''}
                     onChange={handleServingsChange}
+                    aria-valuemin={1}
+                    aria-valuenow={servings ?? undefined}
                     aria-invalid={Boolean(servingsError)}
                     className="w-40 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
                 />

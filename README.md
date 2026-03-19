@@ -83,4 +83,4 @@ Las contribuciones son bienvenidas. Abrí un issue o un pull request para propon
 
 ## Licencia
 
-MIT.
+Este proyecto esta bajo licencia MIT. Ver [LICENSE](LICENSE) para el texto completo.

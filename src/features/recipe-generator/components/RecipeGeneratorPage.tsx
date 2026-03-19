@@ -62,20 +62,25 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
   const [recipe, setRecipe] = useState<Awaited<ReturnType<typeof generateRecipe>> | null>(null);
 
   const handleIngredientsChange = (ingredients: IngredientFormRows) => {
-    setFormState((prev) => ({ ...prev, ingredients }));
+    setFormState((prev) => {
+      return { ...prev, ingredients };
+    });
   };
 
   const handleServingsChange = (servings: number | null) => {
-    setFormState((prev) => ({ ...prev, servings }));
+    setFormState((prev) => {
+      return { ...prev, servings };
+    });
   };
 
   const handleNotesChange = (notes: string) => {
-    setFormState((prev) => ({ ...prev, notes }));
+    setFormState((prev) => {
+      return { ...prev, notes };
+    });
   };
 
   const handleSubmit = async () => {
-    const ingredients = formState.ingredients;
-    const servings = formState.servings;
+    const { ingredients, notes, servings } = formState;
     const validationResults = validateIngredients(ingredients);
     const hasErrors = validationResults.some((item) => item.name || item.quantity || item.unit);
 
@@ -85,7 +90,7 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
       return;
     }
 
-    if (servings === null || servings <= 0) {
+    if (servings === null || !Number.isInteger(servings) || servings <= 0) {
       setError('Revisá las porciones antes de generar la receta.');
       return;
     }
@@ -102,7 +107,7 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
       const generated = await generateRecipe({
         ingredients: mapRowsToIngredients(ingredients),
         servings,
-        notes: formState.notes,
+        notes,
       });
       setRecipe(generated);
     } catch (caught) {
