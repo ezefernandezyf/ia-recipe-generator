@@ -31,4 +31,9 @@
 ## 5. Skills Registradas
 
 - **Core**: ./skills/react-19/SKILL.md, ./skills/typescript/SKILL.md, ./skills/tailwind-4/SKILL.md.
-- **Proyecto**: ./.github/skills/recipe-prd-architect/SKILL.md.
+- **Proyecto**: ./.github/skills/recipe-prd-architect/SKILL.md, ./skills/ai-sdk-5/SKILL.md.
+
+## 6. Flujo de Git y Ramas
+- **Aislamiento por Worktrees**: Se prefiere el uso de Git Worktrees para aislar la ejecución de sub-agentes en ramas temporales y evitar conflictos en el hilo principal.
+- **Commits Atómicos**: Cada fase del SDD (design, apply, verify) debe finalizar con un commit descriptivo que resuma los cambios, siempre que el código pase el filtro del GGA.
+- **Merge Seguro**: Solo se realizará el merge a la rama principal de la funcionalidad tras una verificación exitosa sin errores CRITICAL.

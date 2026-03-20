@@ -1,3 +1,35 @@
+# Tasks: ia-integration-research
+
+## Phase 1: Foundation
+
+- [ ] 1.1 Add AI SDK/provider dependencies in `package.json` for the server route and structured generation.
+- [ ] 1.2 Create `.env.example` with `AI_PROVIDER` and server-only provider keys; document that secrets must not use `VITE_*`.
+- [ ] 1.3 Add `api/recipe-generator/_provider.ts` to resolve the active provider and fail safely when credentials are missing.
+
+## Phase 2: Core Implementation
+
+- [ ] 2.1 Create `api/recipe-generator/generate.ts` to accept the current recipe request payload and return a `Recipe`-shaped response.
+- [ ] 2.2 Create `api/recipe-generator/suggestions.ts` for recipe suggestions through the same server-side boundary.
+- [ ] 2.3 Update `src/features/recipe-generator/services/ai.ts` to call the new internal endpoints instead of `AI_SERVICE_URL`.
+- [ ] 2.4 Keep `src/features/recipe-generator/components/RecipeGeneratorPage.tsx` behavior stable while consuming the new service contract and safe errors.
+
+## Phase 3: Integration / Wiring
+
+- [ ] 3.1 Wire provider selection by env in the new server route helpers so Groq or Google can be swapped without client changes.
+- [ ] 3.2 Map server responses to the existing `Recipe` domain contract used by `src/features/recipe-generator/services/recipeMapper.ts`.
+- [ ] 3.3 Preserve loading/error/success rendering in `src/features/recipe-generator/components/RecipeResult.tsx` and the page container.
+
+## Phase 4: Testing / Verification
+
+- [ ] 4.1 Add unit tests for `src/features/recipe-generator/services/ai.ts` covering request URLs, safe failures, and response mapping.
+- [ ] 4.2 Add route-level tests for `api/recipe-generator/generate.ts` covering provider selection, missing secret failure, and invalid payload handling.
+- [ ] 4.3 Add a UI regression test in `src/features/recipe-generator/components/RecipeGeneratorPage.test.tsx` for the server-failure scenario from the spec.
+
+## Phase 5: Cleanup / Documentation
+
+- [ ] 5.1 Update `README.md` or docs with the required AI environment variables and local dev setup.
+- [ ] 5.2 Remove any leftover placeholder endpoint references to `AI_SERVICE_URL` across the repo.
+
 # Tasks: initial-requirements
 
 ## Phase 1: Foundation

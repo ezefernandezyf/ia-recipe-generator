@@ -34,6 +34,10 @@ Project: IA-Recipe-Generator
   - Path: `C:/Users/ezefe/Desktop/IA-Recipe-Generator/.github/skills/recipe-prd-architect/SKILL.md`
   - Scope: project
   - Trigger: Create/update recipe PRD with user flow, data model, and stack confirmation
+- `ai-sdk-5`
+  - Path: `C:/Users/ezefe/Desktop/IA-Recipe-Generator/skills/ai-sdk-5/SKILL.md`
+  - Scope: project
+  - Trigger: Vercel AI SDK 5 patterns and AI chat feature implementation
 - `skill-creator`
   - Path: `C:/Users/ezefe/Desktop/IA-Recipe-Generator/skills/skill-creator/SKILL.md`
   - Scope: project
@@ -50,7 +54,7 @@ Project: IA-Recipe-Generator
 ## Project Convention Files
 - `AGENTS.md`
   - Type: project instruction index
-  - Referenced local files detected: `./skills/react-19/SKILL.md`, `./skills/typescript/SKILL.md`, `./skills/tailwind-4/SKILL.md`, `./skills/skill-creator/SKILL.md`, `./.github/skills/recipe-prd-architect/SKILL.md`
+  - Referenced local files detected: `./skills/react-19/SKILL.md`, `./skills/typescript/SKILL.md`, `./skills/tailwind-4/SKILL.md`, `./skills/skill-creator/SKILL.md`, `./skills/ai-sdk-5/SKILL.md`, `./.github/skills/recipe-prd-architect/SKILL.md`
 
 ## Exclusions Applied
 - Skipped skill folders matching: `sdd-*`, `_shared`, `skill-registry`
