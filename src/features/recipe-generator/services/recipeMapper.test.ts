@@ -28,7 +28,7 @@ describe('mapApiRecipeToDomain', () => {
       title: 'Pasta casera',
       ingredients: [
         { name: 'Harina', quantity: 200, unit: 'g', notes: '0000' },
-        { name: 'Agua', quantity: 100, unit: 'ml', notes: '' },
+        { name: 'Agua', quantity: 100, unit: 'ml', notes: undefined },
       ],
       instructions: ['Mezclar', 'Amasar'],
       preparationTimeMinutes: 20,
@@ -44,31 +44,16 @@ describe('mapApiRecipeToDomain', () => {
     });
   });
 
-  it('applies safe defaults for partial payloads', () => {
-    const result = mapApiRecipeToDomain({
-      difficulty: 'unknown-level',
-      ingredients: [{ name: 5, quantity: 'x', unit: 'invalid' }],
-      macros: null,
-      instructions: [1, 'Paso valido', false],
-    });
-
-    expect(result).toEqual({
-      id: undefined,
-      title: 'Untitled recipe',
-      ingredients: [
-        { name: '', quantity: 0, unit: 'unit', notes: '' },
-      ],
-      instructions: ['Paso valido'],
-      preparationTimeMinutes: 0,
-      totalTimeMinutes: undefined,
-      servings: undefined,
-      difficulty: 'medium',
-      macros: {
-        calories: 0,
-        protein: 0,
-        carbohydrates: 0,
-        fats: 0,
-      },
-    });
+  it('throws on malformed payloads instead of fabricating a default recipe', () => {
+    expect(() =>
+      mapApiRecipeToDomain({
+        title: '',
+        ingredients: [{ name: 5, quantity: 'x', unit: 'invalid' }],
+        instructions: [1, 'Paso valido', false],
+        preparationTimeMinutes: -10,
+        difficulty: 'unknown-level',
+        macros: null,
+      })
+    ).toThrow('La respuesta de la receta no es valida.');
   });
 });

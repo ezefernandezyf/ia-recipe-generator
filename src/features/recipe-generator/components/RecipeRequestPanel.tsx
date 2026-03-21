@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 
 interface RecipeRequestPanelProps {
@@ -7,6 +8,8 @@ interface RecipeRequestPanelProps {
     onServingsChange: (value: number | null) => void;
     onNotesChange: (value: string) => void;
 }
+
+type RecipeRequestPanelView = ReactElement;
 
 const isValidServingsValue = (value: string): value is `${number}` => {
     if (value.trim().length === 0) {
@@ -23,7 +26,7 @@ const RecipeRequestPanel = ({
     notes,
     onServingsChange,
     onNotesChange,
-}: RecipeRequestPanelProps) => {
+}: RecipeRequestPanelProps): RecipeRequestPanelView => {
     const servingsInputId = 'recipe-request-servings';
     const notesTextareaId = 'recipe-request-notes';
     const [servingsError, setServingsError] = useState<string | null>(null);

@@ -59,6 +59,20 @@ npm start
 
 Luego abrilo en `http://localhost:5173`.
 
+## Variables de entorno para IA
+
+El generador ahora usa rutas internas en el servidor. Defini estas variables en `.env.local`:
+
+```bash
+AI_PROVIDER=groq
+GROQ_API_KEY=tu_clave_de_groq
+GOOGLE_GENERATIVE_AI_API_KEY=tu_clave_de_google
+```
+
+- `AI_PROVIDER` acepta `groq` o `google`.
+- Las claves no deben exponerse con prefijos `VITE_*`.
+- Si usas un solo proveedor, solo completá la variable correspondiente.
+
 ## Preview de produccion
 
 ```bash
