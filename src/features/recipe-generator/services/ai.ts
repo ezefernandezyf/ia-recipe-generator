@@ -1,7 +1,7 @@
 import type { Ingredient, Recipe } from '../model/recipe';
 import { mapApiRecipeToDomain } from './recipeMapper';
 
-const AI_SERVICE_URL = 'https://api.example.com/recipe-generator';
+const AI_SERVICE_BASE_URL = '/api/recipe-generator';
 
 interface GenerateRecipeRequest {
     ingredients: Ingredient[];
@@ -36,7 +36,7 @@ const toUserSafeError = (fallbackMessage: string): Error => {
 };
 
 const requestJson = async <T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> => {
-    const response = await fetch(input, init);
+    const response = typeof init === 'undefined' ? await fetch(input) : await fetch(input, init);
 
     if (!response.ok) {
         throw toUserSafeError('Recipe service is unavailable right now.');
@@ -50,7 +50,7 @@ export const generateRecipe = async (
 ): Promise<Recipe> => {
     try {
         const response = await requestJson<GenerateRecipeResponse>(
-            `${AI_SERVICE_URL}/generate`,
+            `${AI_SERVICE_BASE_URL}/generate`,
             {
                 method: 'POST',
                 headers: {
@@ -81,7 +81,7 @@ export const fetchRecipeSuggestions = async (
         }
 
         const response = await requestJson<RecipeSuggestionsResponse>(
-            `${AI_SERVICE_URL}/suggestions?${search.toString()}`
+            `${AI_SERVICE_BASE_URL}/suggestions?${search.toString()}`
         );
 
         return Array.isArray(response.suggestions) ? response.suggestions : [];

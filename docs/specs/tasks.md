@@ -1,78 +1,19 @@
-# Tasks: ia-integration-research
+# Tasks: AGENTS Compliance Hardening
 
-## Phase 1: Foundation
+## Phase 1: Audit / Approval Gate
 
-- [ ] 1.1 Add AI SDK/provider dependencies in `package.json` for the server route and structured generation.
-- [ ] 1.2 Create `.env.example` with `AI_PROVIDER` and server-only provider keys; document that secrets must not use `VITE_*`.
-- [ ] 1.3 Add `api/recipe-generator/_provider.ts` to resolve the active provider and fail safely when credentials are missing.
+- [x] 1.1 Review `src/features/recipe-generator/components/RecipeResult.tsx` and `RecipeRequestPanel.tsx` against the typed component pattern in `src/app.tsx` and `src/AppRoutes.tsx`.
+- [x] 1.2 Audit `src/features/recipe-generator/**` for real literal `any`, non-defensive `unknown`, and `Partial<T>` outside local patch or test-builder scope.
+- [x] 1.3 Confirm `README.md` and `package.json` still agree on `npm run dev` and the documented scripts.
 
-## Phase 2: Core Implementation
+## Phase 2: Code Compliance Fixes
 
-- [ ] 2.1 Create `api/recipe-generator/generate.ts` to accept the current recipe request payload and return a `Recipe`-shaped response.
-- [ ] 2.2 Create `api/recipe-generator/suggestions.ts` for recipe suggestions through the same server-side boundary.
-- [ ] 2.3 Update `src/features/recipe-generator/services/ai.ts` to call the new internal endpoints instead of `AI_SERVICE_URL`.
-- [ ] 2.4 Keep `src/features/recipe-generator/components/RecipeGeneratorPage.tsx` behavior stable while consuming the new service contract and safe errors.
+- [x] 2.1 Add `RecipeResultView` and `RecipeRequestPanelView` aliases and explicit return types to the two untyped recipe components.
+- [x] 2.2 Fix only verified typing violations from Phase 1, using narrow defensive helpers or explicit domain types instead of broad `unknown` or `Partial<T>` rewrites.
+- [x] 2.3 Update `README.md` only if the developer script documentation drifts from `package.json`.
 
-## Phase 3: Integration / Wiring
+## Phase 3: Verification / Human in the Loop
 
-- [ ] 3.1 Wire provider selection by env in the new server route helpers so Groq or Google can be swapped without client changes.
-- [ ] 3.2 Map server responses to the existing `Recipe` domain contract used by `src/features/recipe-generator/services/recipeMapper.ts`.
-- [ ] 3.3 Preserve loading/error/success rendering in `src/features/recipe-generator/components/RecipeResult.tsx` and the page container.
-
-## Phase 4: Testing / Verification
-
-- [ ] 4.1 Add unit tests for `src/features/recipe-generator/services/ai.ts` covering request URLs, safe failures, and response mapping.
-- [ ] 4.2 Add route-level tests for `api/recipe-generator/generate.ts` covering provider selection, missing secret failure, and invalid payload handling.
-- [ ] 4.3 Add a UI regression test in `src/features/recipe-generator/components/RecipeGeneratorPage.test.tsx` for the server-failure scenario from the spec.
-
-## Phase 5: Cleanup / Documentation
-
-- [ ] 5.1 Update `README.md` or docs with the required AI environment variables and local dev setup.
-- [ ] 5.2 Remove any leftover placeholder endpoint references to `AI_SERVICE_URL` across the repo.
-
-# Tasks: initial-requirements
-
-## Phase 1: Foundation
-
-- [x] 1.1 Normalize domain types in `src/features/recipe-generator/model/recipe.ts` (ingredient, macros, difficulty, times) to match `docs/specs/recipe_gen_prd.md`.
-- [x] 1.2 Add `src/features/recipe-generator/model/validation.ts` with typed validators for ingredient input (required name, quantity > 0, allowed unit).
-- [x] 1.3 Add `src/features/recipe-generator/model/defaults.ts` with default form state and helpers for empty ingredient rows.
-
-## Phase 2: Core Implementation
-
-- [x] 2.1 Create `src/features/recipe-generator/components/IngredientForm.tsx` with add/edit/remove ingredient rows.
-- [x] 2.2 Create `src/features/recipe-generator/components/IngredientRow.tsx` with controlled inputs for `name`, `quantity`, `unit`.
-- [x] 2.3 Create `src/features/recipe-generator/components/RecipeRequestPanel.tsx` for servings and optional notes/preferences.
-- [x] 2.4 Refactor `src/features/recipe-generator/services/ai.ts` to use strict request/response types (remove `any`) and map API errors to user-safe messages.
-- [x] 2.5 Create `src/features/recipe-generator/services/recipeMapper.ts` to transform API payloads into `Recipe` model.
-
-## Phase 3: Integration and Wiring
-
-- [x] 3.1 Create `src/features/recipe-generator/components/RecipeResult.tsx` to render title, ingredients, instructions, macros, prep time, and difficulty.
-- [x] 3.2 Create `src/features/recipe-generator/components/RecipeGeneratorPage.tsx` to orchestrate form submit, loading state, error state, and result rendering.
-- [x] 3.3 Update `src/features/recipe-generator/components/index.ts` to export all new feature components.
-- [x] 3.4 Wire route/page in `src/AppRoutes.tsx` (or create it if missing) for the recipe generator screen.
-- [x] 3.5 Ensure root composition remains valid between `src/main.tsx` and `src/app.tsx` (single render entrypoint).
-
-## Phase 4: Testing and Verification
-
-- [x] 4.1 Add test setup (Vitest + Testing Library) in `package.json`, `vitest.config.ts`, and `src/test/setup.ts`.
-- [x] 4.2 Add unit tests for `model/validation.ts` covering invalid quantity, missing name, and valid ingredient cases.
-- [x] 4.3 Add unit tests for `services/recipeMapper.ts` covering full payload and partial payload fallbacks.
-- [x] 4.4 Add component tests for `IngredientForm.tsx` (add/remove rows, validation feedback).
-- [x] 4.5 Add integration test for `RecipeGeneratorPage.tsx` with mocked `generateRecipe` service.
-
-## Phase 5: Docs and Handoff
-
-- [x] 5.1 Update `docs/specs/recipe_gen_prd.md` if implementation decisions alter field names or flow details.
-- [x] 5.2 Update `docs/specs/design.md` with final component/service boundaries after wiring.
-- [x] 5.3 Mark completed items in this file and prepare verify handoff checklist.
-
-## Verify Handoff Checklist
-
-- [x] Proposal/spec/design/tasks artifacts available in Engram (`sdd/initial-requirements/*`).
-- [x] Test setup present (`vitest.config.ts`, `src/test/setup.ts`, `package.json` scripts).
-- [x] Unit tests present for `validation.ts` and `recipeMapper.ts`.
-- [x] Component/integration tests present for `IngredientForm.tsx` and `RecipeGeneratorPage.tsx`.
-- [x] Documentation synchronized (`recipe_gen_prd.md` and `design.md`).
-- [x] Ready to run `sdd-verify` for `initial-requirements`.
+- [x] 3.1 Run the recipe-generator component tests to confirm the typed components still render and behavior is unchanged.
+- [x] 3.2 Run typecheck and the focused feature tests to confirm no new AGENTS compliance regressions were introduced.
+- [x] 3.3 Re-scan the touched scope for remaining real violations, then pause for human approval before `sdd-apply` continues.

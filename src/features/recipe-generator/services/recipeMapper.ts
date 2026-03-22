@@ -1,29 +1,36 @@
 import type { DifficultyLevel, Ingredient, IngredientUnit, Macros, Recipe } from '../model/recipe';
 
-interface PartialApiIngredient {
-    name?: unknown;
-    quantity?: unknown;
-    unit?: unknown;
-    notes?: unknown;
+interface ValidApiIngredient {
+    name: string;
+    quantity: number;
+    unit: IngredientUnit;
+    notes?: string;
 }
 
-interface PartialApiMacros {
-    calories?: unknown;
-    protein?: unknown;
-    carbohydrates?: unknown;
-    fats?: unknown;
+interface ValidApiMacros {
+    calories: number;
+    protein: number;
+    carbohydrates: number;
+    fats: number;
 }
 
-interface PartialApiRecipe {
-    id?: unknown;
-    title?: unknown;
-    ingredients?: unknown;
-    instructions?: unknown;
-    preparationTimeMinutes?: unknown;
-    totalTimeMinutes?: unknown;
-    servings?: unknown;
-    difficulty?: unknown;
-    macros?: unknown;
+interface ValidApiRecipe {
+    id?: string;
+    title: string;
+    ingredients: ValidApiIngredient[];
+    instructions: string[];
+    preparationTimeMinutes: number;
+    totalTimeMinutes?: number;
+    servings?: number;
+    difficulty: DifficultyLevel;
+    macros: ValidApiMacros;
+}
+
+class InvalidRecipePayloadError extends Error {
+    constructor() {
+        super('La respuesta de la receta no es valida.');
+        this.name = 'InvalidRecipePayloadError';
+    }
 }
 
 const DIFFICULTY = {
@@ -44,65 +51,106 @@ const asNumber = (value: unknown, fallback = 0): number => {
     return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 };
 
-const asStringArray = (value: unknown): string[] => {
-    if (!Array.isArray(value)) {
-        return [];
+const isObject = (value: unknown): value is Record<string, unknown> => {
+    return typeof value === 'object' && value !== null;
+};
+
+const isValidIngredient = (value: unknown): value is ValidApiIngredient => {
+    if (!isObject(value)) {
+        return false;
     }
-    return value.filter((entry): entry is string => typeof entry === 'string');
+
+    const maybeUnit = value.unit;
+
+    return (
+        typeof value.name === 'string' &&
+        value.name.trim().length > 0 &&
+        typeof value.quantity === 'number' &&
+        Number.isFinite(value.quantity) &&
+        value.quantity > 0 &&
+        typeof maybeUnit === 'string' &&
+        ALLOWED_UNITS.has(maybeUnit as IngredientUnit) &&
+        (typeof value.notes === 'undefined' || typeof value.notes === 'string')
+    );
 };
 
-const toIngredient = (input: PartialApiIngredient): Ingredient => {
-    const maybeUnit = asString(input.unit, 'unit');
-    const unit: IngredientUnit = ALLOWED_UNITS.has(maybeUnit as IngredientUnit)
-        ? (maybeUnit as IngredientUnit)
-        : 'unit';
+const isValidMacros = (value: unknown): value is ValidApiMacros => {
+    if (!isObject(value)) {
+        return false;
+    }
+
+    return ['calories', 'protein', 'carbohydrates', 'fats'].every((key) => {
+        const maybeValue = value[key as keyof ValidApiMacros];
+        return typeof maybeValue === 'number' && Number.isFinite(maybeValue) && maybeValue >= 0;
+    });
+};
+
+const isValidRecipePayload = (input: unknown): input is ValidApiRecipe => {
+    if (!isObject(input)) {
+        return false;
+    }
+
+    return (
+        (typeof input.id === 'undefined' || typeof input.id === 'string') &&
+        typeof input.title === 'string' &&
+        input.title.trim().length > 0 &&
+        Array.isArray(input.ingredients) &&
+        input.ingredients.length > 0 &&
+        input.ingredients.every(isValidIngredient) &&
+        Array.isArray(input.instructions) &&
+        input.instructions.length > 0 &&
+        input.instructions.every((step) => typeof step === 'string' && step.trim().length > 0) &&
+        typeof input.preparationTimeMinutes === 'number' &&
+        Number.isInteger(input.preparationTimeMinutes) &&
+        input.preparationTimeMinutes >= 0 &&
+        (typeof input.totalTimeMinutes === 'undefined' || (typeof input.totalTimeMinutes === 'number' && Number.isInteger(input.totalTimeMinutes) && input.totalTimeMinutes >= 0)) &&
+        (typeof input.servings === 'undefined' || (typeof input.servings === 'number' && Number.isInteger(input.servings) && input.servings > 0)) &&
+        typeof input.difficulty === 'string' &&
+        ALLOWED_DIFFICULTIES.has(input.difficulty) &&
+        isValidMacros(input.macros)
+    );
+};
+
+const throwInvalidRecipePayload = (): never => {
+    throw new InvalidRecipePayloadError();
+};
+
+const toIngredient = (input: ValidApiIngredient): Ingredient => {
+    const unit = input.unit;
 
     return {
-        name: asString(input.name),
-        quantity: asNumber(input.quantity),
+        name: input.name,
+        quantity: input.quantity,
         unit,
-        notes: asString(input.notes),
+        notes: typeof input.notes === 'string' && input.notes.trim().length > 0 ? input.notes.trim() : undefined,
     };
 };
 
-const toMacros = (input: PartialApiMacros): Macros => {
+const toMacros = (input: ValidApiMacros): Macros => {
     return {
-        calories: asNumber(input.calories),
-        protein: asNumber(input.protein),
-        carbohydrates: asNumber(input.carbohydrates),
-        fats: asNumber(input.fats),
+        calories: input.calories,
+        protein: input.protein,
+        carbohydrates: input.carbohydrates,
+        fats: input.fats,
     };
-};
-
-const toDifficulty = (value: unknown): DifficultyLevel => {
-    const maybeDifficulty = asString(value, DIFFICULTY.MEDIUM);
-    return ALLOWED_DIFFICULTIES.has(maybeDifficulty)
-        ? (maybeDifficulty as DifficultyLevel)
-        : DIFFICULTY.MEDIUM;
 };
 
 export const mapApiRecipeToDomain = (input: unknown): Recipe => {
-    const data: PartialApiRecipe =
-        typeof input === 'object' && input !== null ? (input as PartialApiRecipe) : {};
+    if (!isValidRecipePayload(input)) {
+        throwInvalidRecipePayload();
+    }
 
-    const ingredientsRaw = Array.isArray(data.ingredients)
-        ? (data.ingredients as PartialApiIngredient[])
-        : [];
-
-    const macrosRaw: PartialApiMacros =
-        typeof data.macros === 'object' && data.macros !== null
-            ? (data.macros as PartialApiMacros)
-            : {};
+    const data = input as ValidApiRecipe;
 
     return {
-        id: asString(data.id) || undefined,
-        title: asString(data.title, 'Untitled recipe'),
-        ingredients: ingredientsRaw.map(toIngredient),
-        instructions: asStringArray(data.instructions),
-        preparationTimeMinutes: asNumber(data.preparationTimeMinutes),
-        totalTimeMinutes: asNumber(data.totalTimeMinutes) || undefined,
-        servings: asNumber(data.servings) || undefined,
-        difficulty: toDifficulty(data.difficulty),
-        macros: toMacros(macrosRaw),
+        id: data.id || undefined,
+        title: data.title,
+        ingredients: data.ingredients.map(toIngredient),
+        instructions: data.instructions,
+        preparationTimeMinutes: data.preparationTimeMinutes,
+        totalTimeMinutes: data.totalTimeMinutes,
+        servings: data.servings,
+        difficulty: data.difficulty,
+        macros: toMacros(data.macros),
     };
 };

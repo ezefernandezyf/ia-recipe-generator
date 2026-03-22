@@ -16,8 +16,25 @@ describe('RecipeGeneratorPage', () => {
   it('submits ingredient data and renders generated recipe', async () => {
     const user = userEvent.setup();
     const generateRecipeMock = vi.mocked(generateRecipe);
+    let resolveRecipe!: (value: Awaited<ReturnType<typeof generateRecipe>>) => void;
+    const pendingRecipe = new Promise<Awaited<ReturnType<typeof generateRecipe>>>((resolve) => {
+      resolveRecipe = resolve;
+    });
 
-    generateRecipeMock.mockResolvedValue({
+    generateRecipeMock.mockReturnValue(pendingRecipe);
+
+    render(<RecipeGeneratorPage />);
+
+    await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
+    const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '2');
+
+    await user.click(screen.getByRole('button', { name: 'Generar receta' }));
+
+    expect(screen.getByRole('button', { name: 'Generando...' })).toBeDisabled();
+
+    resolveRecipe({
       id: 'recipe-1',
       title: 'Sopa de tomate',
       ingredients: [
@@ -35,15 +52,6 @@ describe('RecipeGeneratorPage', () => {
         fats: 8,
       },
     });
-
-    render(<RecipeGeneratorPage />);
-
-    await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
-    const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
-    await user.clear(quantityInput);
-    await user.type(quantityInput, '2');
-
-    await user.click(screen.getByRole('button', { name: 'Generar receta' }));
 
     await waitFor(() => {
       expect(generateRecipeMock).toHaveBeenCalledWith({
@@ -81,5 +89,24 @@ describe('RecipeGeneratorPage', () => {
 
     expect(generateRecipeMock).not.toHaveBeenCalled();
     expect(screen.getByText('Revisá las porciones antes de generar la receta.')).toBeInTheDocument();
+  });
+
+  it('shows a safe error when the recipe request fails on the server', async () => {
+    const user = userEvent.setup();
+    const generateRecipeMock = vi.mocked(generateRecipe);
+
+    generateRecipeMock.mockRejectedValue(new Error('No pudimos generar la receta. Intentalo nuevamente.'));
+
+    render(<RecipeGeneratorPage />);
+
+    await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
+    const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '2');
+
+    await user.click(screen.getByRole('button', { name: 'Generar receta' }));
+
+    expect(await screen.findByText('No pudimos generar la receta. Intentalo nuevamente.')).toBeInTheDocument();
+    expect(screen.queryByText('Sopa de tomate')).not.toBeInTheDocument();
   });
 });

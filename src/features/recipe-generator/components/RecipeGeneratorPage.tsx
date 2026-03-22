@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
+import { Link } from 'react-router-dom';
 import { createDefaultRecipeRequestState, type IngredientFormRow, type IngredientFormRows } from '../model/defaults';
 import type { Ingredient } from '../model/recipe';
 import { validateIngredients } from '../model/validation';
@@ -124,6 +125,9 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
         <header className="space-y-2">
           <h1 className="text-2xl font-bold text-slate-900">Generador de Recetas</h1>
           <p className="text-sm text-slate-600">Ingresa ingredientes y preferencias para obtener una receta sugerida.</p>
+          <Link to="/debug/recipe-generator" className="inline-flex text-sm font-medium text-cyan-700 hover:text-cyan-900">
+            Abrir smoke test de API
+          </Link>
         </header>
 
         <IngredientForm rows={formState.ingredients} onChange={handleIngredientsChange} />

@@ -1,10 +1,13 @@
+import type { ReactElement } from 'react';
 import type { Recipe } from '../model/recipe';
 
 interface RecipeResultProps {
   recipe: Recipe;
 }
 
-const RecipeResult = ({ recipe }: RecipeResultProps) => {
+type RecipeResultView = ReactElement;
+
+const RecipeResult = ({ recipe }: RecipeResultProps): RecipeResultView => {
   return (
     <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <header className="space-y-2">
