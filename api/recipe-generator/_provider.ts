@@ -10,7 +10,7 @@ class MissingAiProviderError extends Error {
     }
 }
 
-const DEFAULT_GROQ_MODEL = 'qwen/qwen3-32b';
+const DEFAULT_GROQ_MODEL = 'openai/gpt-oss-20b';
 const DEFAULT_GOOGLE_MODEL = 'gemini-2.5-flash';
 
 const assertConfigured = (name: string, value: string | undefined) => {
@@ -32,9 +32,9 @@ export const resolveRecipeModel = () => {
 
     if (providerName === 'google') {
         assertConfigured('GOOGLE_GENERATIVE_AI_API_KEY', process.env.GOOGLE_GENERATIVE_AI_API_KEY);
-        return google(DEFAULT_GOOGLE_MODEL);
+        return google(process.env.GOOGLE_MODEL ?? DEFAULT_GOOGLE_MODEL);
     }
 
     assertConfigured('GROQ_API_KEY', process.env.GROQ_API_KEY);
-    return groq(DEFAULT_GROQ_MODEL);
+    return groq(process.env.GROQ_MODEL ?? DEFAULT_GROQ_MODEL);
 };

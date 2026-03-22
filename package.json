@@ -24,9 +24,9 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "@ai-sdk/google": "^3.0.43",
-    "@ai-sdk/groq": "^3.0.29",
-    "ai": "^5.0.0",
+    "@ai-sdk/google": "^3.0.52",
+    "@ai-sdk/groq": "^3.0.31",
+    "ai": "^6.0.134",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.30.1",

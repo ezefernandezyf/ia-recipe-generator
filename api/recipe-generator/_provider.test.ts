@@ -26,7 +26,7 @@ describe('resolveRecipeModel', () => {
 
         const model = resolveRecipeModel();
 
-        expect(mocks.groq).toHaveBeenCalledWith('qwen/qwen3-32b');
+        expect(mocks.groq).toHaveBeenCalledWith('openai/gpt-oss-20b');
         expect(model).toBe('groq-model');
     });
 

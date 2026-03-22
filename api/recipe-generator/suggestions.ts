@@ -1,4 +1,4 @@
-import { NoObjectGeneratedError, generateObject } from 'ai';
+import { NoObjectGeneratedError, Output, generateText } from 'ai';
 import { z } from 'zod';
 import { isMissingAiProviderError, resolveRecipeModel } from './_provider';
 
@@ -27,14 +27,16 @@ export async function GET(request: Request): Promise<Response> {
         const diet = url.searchParams.get('diet');
         const maxPreparationTimeMinutes = url.searchParams.get('maxPreparationTimeMinutes');
 
-        const result = await generateObject({
-            model: resolveRecipeModel() as unknown as Parameters<typeof generateObject>[0]['model'],
+        const result = await generateText({
+            model: resolveRecipeModel(),
             system: 'Sos un asistente que sugiere ideas de recetas breves.',
             prompt: buildPrompt(diet, maxPreparationTimeMinutes),
-            schema: suggestionsSchema,
+            output: Output.object({
+                schema: suggestionsSchema,
+            }),
         });
 
-        return Response.json(result.object);
+        return Response.json(result.output);
     } catch (error) {
         if (isMissingAiProviderError(error)) {
             return errorResponse(error.message, 503);

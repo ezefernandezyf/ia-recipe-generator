@@ -1,25 +1,32 @@
-import { NoObjectGeneratedError, generateObject } from 'ai';
+import { NoObjectGeneratedError, Output, generateText } from 'ai';
 import { z } from 'zod';
 import { isMissingAiProviderError, resolveRecipeModel } from './_provider';
 
 const ingredientUnitSchema = z.enum(['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'unit']);
 const difficultySchema = z.enum(['easy', 'medium', 'hard']);
 
-const ingredientSchema = z.object({
+const requestIngredientSchema = z.object({
     name: z.string().min(1),
     quantity: z.number().positive(),
     unit: ingredientUnitSchema,
     notes: z.string().optional(),
 });
 
+const ingredientSchema = z.object({
+    name: z.string().min(1),
+    quantity: z.number().positive(),
+    unit: ingredientUnitSchema,
+    notes: z.string().nullable(),
+});
+
 const recipeSchema = z.object({
-    id: z.string().optional(),
+    id: z.string().nullable(),
     title: z.string().min(1),
     ingredients: z.array(ingredientSchema),
     instructions: z.array(z.string().min(1)),
     preparationTimeMinutes: z.number().int().nonnegative(),
-    totalTimeMinutes: z.number().int().nonnegative().optional(),
-    servings: z.number().int().positive().optional(),
+    totalTimeMinutes: z.number().int().nonnegative().nullable(),
+    servings: z.number().int().positive().nullable(),
     difficulty: difficultySchema,
     macros: z.object({
         calories: z.number().nonnegative(),
@@ -30,7 +37,7 @@ const recipeSchema = z.object({
 });
 
 const requestSchema = z.object({
-    ingredients: z.array(ingredientSchema).min(1),
+    ingredients: z.array(requestIngredientSchema).min(1),
     servings: z.number().int().positive(),
     notes: z.string().optional(),
 });
@@ -52,6 +59,19 @@ const errorResponse = (message: string, status: number): Response => {
     return Response.json({ error: message }, { status });
 };
 
+const normalizeRecipeOutput = (recipe: z.infer<typeof recipeSchema>) => {
+    return {
+        ...recipe,
+        id: recipe.id ?? undefined,
+        totalTimeMinutes: recipe.totalTimeMinutes ?? undefined,
+        servings: recipe.servings ?? undefined,
+        ingredients: recipe.ingredients.map((ingredient) => ({
+            ...ingredient,
+            notes: ingredient.notes ?? undefined,
+        })),
+    };
+};
+
 export async function POST(request: Request): Promise<Response> {
     try {
         const body = await request.json();
@@ -61,14 +81,16 @@ export async function POST(request: Request): Promise<Response> {
             return errorResponse('Solicitud de receta invalida.', 400);
         }
 
-        const result = await generateObject({
-            model: resolveRecipeModel() as unknown as Parameters<typeof generateObject>[0]['model'],
+        const result = await generateText({
+            model: resolveRecipeModel(),
             system: 'Sos un chef experto que responde solo con JSON valido.',
             prompt: buildPrompt(parsed.data),
-            schema: recipeSchema,
+            output: Output.object({
+                schema: recipeSchema,
+            }),
         });
 
-        return Response.json({ recipe: result.object });
+        return Response.json({ recipe: normalizeRecipeOutput(result.output) });
     } catch (error) {
         if (isMissingAiProviderError(error)) {
             return errorResponse(error.message, 503);

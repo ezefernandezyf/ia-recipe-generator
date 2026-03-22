@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { POST } from './generate';
 
 const mocks = vi.hoisted(() => ({
-    generateObject: vi.fn(),
+    generateText: vi.fn(),
     resolveRecipeModel: vi.fn(() => 'recipe-model'),
 }));
 
@@ -11,7 +11,7 @@ vi.mock('ai', async () => {
 
     return {
         ...actual,
-        generateObject: mocks.generateObject,
+        generateText: mocks.generateText,
     };
 });
 
@@ -22,14 +22,14 @@ vi.mock('./_provider', () => ({
 
 describe('POST /api/recipe-generator/generate', () => {
     beforeEach(() => {
-        mocks.generateObject.mockReset();
+        mocks.generateText.mockReset();
         mocks.resolveRecipeModel.mockReset();
         mocks.resolveRecipeModel.mockReturnValue('recipe-model');
     });
 
     it('returns a recipe payload using the provider model', async () => {
-        mocks.generateObject.mockResolvedValue({
-            object: {
+        mocks.generateText.mockResolvedValue({
+            output: {
                 id: 'recipe-1',
                 title: 'Sopa de tomate',
                 ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
@@ -60,7 +60,7 @@ describe('POST /api/recipe-generator/generate', () => {
         );
 
         expect(mocks.resolveRecipeModel).toHaveBeenCalled();
-        expect(mocks.generateObject).toHaveBeenCalled();
+        expect(mocks.generateText).toHaveBeenCalled();
         expect(response.status).toBe(200);
         await expect(response.json()).resolves.toMatchObject({
             recipe: expect.objectContaining({
@@ -90,12 +90,12 @@ describe('POST /api/recipe-generator/generate', () => {
         await expect(response.json()).resolves.toMatchObject({
             error: 'Falta configurar GROQ_API_KEY.',
         });
-        expect(mocks.generateObject).not.toHaveBeenCalled();
+        expect(mocks.generateText).not.toHaveBeenCalled();
     });
 
     it('returns 502 when the provider fails unexpectedly', async () => {
         mocks.resolveRecipeModel.mockReturnValue('recipe-model');
-        mocks.generateObject.mockRejectedValue(new Error('provider exploded'));
+        mocks.generateText.mockRejectedValue(new Error('provider exploded'));
 
         const response = await POST(
             new Request('http://localhost/api/recipe-generator/generate', {
@@ -125,6 +125,6 @@ describe('POST /api/recipe-generator/generate', () => {
         );
 
         expect(response.status).toBe(400);
-        expect(mocks.generateObject).not.toHaveBeenCalled();
+        expect(mocks.generateText).not.toHaveBeenCalled();
     });
 });

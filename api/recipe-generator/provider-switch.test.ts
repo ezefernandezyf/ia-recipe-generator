@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { POST } from './generate';
 
 const mocks = vi.hoisted(() => ({
-    generateObject: vi.fn(),
+    generateText: vi.fn(),
     groq: vi.fn(() => 'groq-model'),
     google: vi.fn(() => 'google-model'),
 }));
@@ -12,7 +12,7 @@ vi.mock('ai', async () => {
 
     return {
         ...actual,
-        generateObject: mocks.generateObject,
+        generateText: mocks.generateText,
     };
 });
 
@@ -27,7 +27,7 @@ vi.mock('@ai-sdk/google', () => ({
 describe('recipe generation provider selection', () => {
     beforeEach(() => {
         vi.unstubAllEnvs();
-        mocks.generateObject.mockReset();
+        mocks.generateText.mockReset();
         mocks.groq.mockClear();
         mocks.google.mockClear();
     });
@@ -40,8 +40,8 @@ describe('recipe generation provider selection', () => {
         vi.stubEnv('AI_PROVIDER', 'groq');
         vi.stubEnv('GROQ_API_KEY', 'groq-key');
 
-        mocks.generateObject.mockResolvedValue({
-            object: {
+        mocks.generateText.mockResolvedValue({
+            output: {
                 id: 'recipe-1',
                 title: 'Sopa de tomate',
                 ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
@@ -73,7 +73,7 @@ describe('recipe generation provider selection', () => {
 
         expect(mocks.groq).toHaveBeenCalledWith('qwen/qwen3-32b');
         expect(mocks.google).not.toHaveBeenCalled();
-        expect(mocks.generateObject).toHaveBeenCalledWith(
+        expect(mocks.generateText).toHaveBeenCalledWith(
             expect.objectContaining({
                 model: 'groq-model',
             })
@@ -90,8 +90,8 @@ describe('recipe generation provider selection', () => {
         vi.stubEnv('AI_PROVIDER', 'google');
         vi.stubEnv('GOOGLE_GENERATIVE_AI_API_KEY', 'google-key');
 
-        mocks.generateObject.mockResolvedValue({
-            object: {
+        mocks.generateText.mockResolvedValue({
+            output: {
                 id: 'recipe-1',
                 title: 'Sopa de tomate',
                 ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
@@ -123,7 +123,7 @@ describe('recipe generation provider selection', () => {
 
         expect(mocks.google).toHaveBeenCalledWith('gemini-2.5-flash');
         expect(mocks.groq).not.toHaveBeenCalled();
-        expect(mocks.generateObject).toHaveBeenCalledWith(
+        expect(mocks.generateText).toHaveBeenCalledWith(
             expect.objectContaining({
                 model: 'google-model',
             })

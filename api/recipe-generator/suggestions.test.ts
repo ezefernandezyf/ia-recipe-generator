@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GET } from './suggestions';
 
 const mocks = vi.hoisted(() => ({
-    generateObject: vi.fn(),
+    generateText: vi.fn(),
     resolveRecipeModel: vi.fn(() => 'recipe-model'),
 }));
 
@@ -11,7 +11,7 @@ vi.mock('ai', async () => {
 
     return {
         ...actual,
-        generateObject: mocks.generateObject,
+        generateText: mocks.generateText,
     };
 });
 
@@ -22,14 +22,14 @@ vi.mock('./_provider', () => ({
 
 describe('GET /api/recipe-generator/suggestions', () => {
     beforeEach(() => {
-        mocks.generateObject.mockReset();
+        mocks.generateText.mockReset();
         mocks.resolveRecipeModel.mockReset();
         mocks.resolveRecipeModel.mockReturnValue('recipe-model');
     });
 
     it('returns suggestions from the provider model', async () => {
-        mocks.generateObject.mockResolvedValue({
-            object: { suggestions: ['Usar arroz', 'Agregar hierbas'] },
+        mocks.generateText.mockResolvedValue({
+            output: { suggestions: ['Usar arroz', 'Agregar hierbas'] },
         });
 
         const response = await GET(
@@ -37,7 +37,7 @@ describe('GET /api/recipe-generator/suggestions', () => {
         );
 
         expect(mocks.resolveRecipeModel).toHaveBeenCalled();
-        expect(mocks.generateObject).toHaveBeenCalled();
+        expect(mocks.generateText).toHaveBeenCalled();
         expect(response.status).toBe(200);
         await expect(response.json()).resolves.toEqual({
             suggestions: ['Usar arroz', 'Agregar hierbas'],
@@ -55,12 +55,12 @@ describe('GET /api/recipe-generator/suggestions', () => {
         await expect(response.json()).resolves.toMatchObject({
             error: 'Falta configurar GOOGLE_GENERATIVE_AI_API_KEY.',
         });
-        expect(mocks.generateObject).not.toHaveBeenCalled();
+        expect(mocks.generateText).not.toHaveBeenCalled();
     });
 
     it('returns 502 when the provider fails unexpectedly', async () => {
         mocks.resolveRecipeModel.mockReturnValue('recipe-model');
-        mocks.generateObject.mockRejectedValue(new Error('provider exploded'));
+        mocks.generateText.mockRejectedValue(new Error('provider exploded'));
 
         const response = await GET(new Request('http://localhost/api/recipe-generator/suggestions'));
 

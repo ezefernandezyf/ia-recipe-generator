@@ -59,6 +59,10 @@ npm start
 
 Luego abrilo en `http://localhost:5173`.
 
+El servidor de desarrollo también expone las rutas internas de IA en `/api/recipe-generator/*`, así que la UI puede generar recetas sin un backend adicional durante `npm run dev` o `npm run preview`.
+
+Para depurar credenciales o proveedor desde el navegador, usá `/debug/recipe-generator`. Ese panel permite elegir el servicio, pegar una API key temporal y probar la respuesta completa del endpoint en una sola pantalla.
+
 ## Variables de entorno para IA
 
 El generador ahora usa rutas internas en el servidor. Defini estas variables en `.env.local`:
