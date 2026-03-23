@@ -84,6 +84,12 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
 
   const handleSubmit = async () => {
     const { ingredients, notes, servings } = formState;
+
+    if (ingredients.length === 0) {
+      setError('Agregá al menos un ingrediente antes de generar la receta.');
+      return;
+    }
+
     const validationResults = validateIngredients(ingredients);
     const hasErrors = validationResults.some(hasIngredientErrors);
 

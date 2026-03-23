@@ -8,7 +8,7 @@ export interface IngredientFormRow {
     notes: string;
 }
 
-export type IngredientFormRows = [IngredientFormRow, ...IngredientFormRow[]];
+export type IngredientFormRows = IngredientFormRow[];
 
 export interface RecipeRequestFormState {
     ingredients: IngredientFormRows;
