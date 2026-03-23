@@ -38,7 +38,7 @@ const IngredientForm = ({ rows, onChange }: IngredientFormProps): IngredientForm
 
     const addRow = () => {
         const emptyRow: IngredientFormRow = createEmptyIngredientRow();
-        const nextRows = ensureIngredientFormRows([...rows, emptyRow]);
+        const nextRows = ensureIngredientFormRows([emptyRow, ...rows]);
 
         onChange(nextRows);
     };
@@ -58,13 +58,16 @@ const IngredientForm = ({ rows, onChange }: IngredientFormProps): IngredientForm
     };
 
     return (
-        <section className="space-y-3">
-            <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold text-slate-900">Ingredientes</h2>
+        <section className="space-y-4 rounded-2xl border border-stone-200 bg-white/90 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur">
+            <div className="flex items-center justify-between gap-3">
+                <div>
+                    <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-stone-500">Ingredientes</h2>
+                    <p className="text-sm text-stone-600">Agregá ingredientes y dejá la fila nueva arriba para cargarla enseguida.</p>
+                </div>
                 <button
                     type="button"
                     onClick={addRow}
-                    className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:opacity-90"
+                    className="rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
                 >
                     Agregar ingrediente
                 </button>

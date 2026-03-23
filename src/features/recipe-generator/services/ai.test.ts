@@ -15,6 +15,7 @@ beforeEach(() => {
 
 describe('recipe AI service', () => {
   it('posts recipe generation requests to the internal endpoint', async () => {
+    const abortController = new AbortController();
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -43,6 +44,8 @@ describe('recipe AI service', () => {
       ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
       servings: 2,
       notes: 'sin sal',
+    }, {
+      signal: abortController.signal,
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
@@ -50,6 +53,7 @@ describe('recipe AI service', () => {
       expect.objectContaining({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortController.signal,
         body: JSON.stringify({
           ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
           servings: 2,

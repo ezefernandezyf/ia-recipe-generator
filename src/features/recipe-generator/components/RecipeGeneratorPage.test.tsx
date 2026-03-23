@@ -1,6 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { generateRecipe } from '../services/ai';
 import RecipeGeneratorPage from './RecipeGeneratorPage';
 
@@ -9,6 +11,14 @@ vi.mock('../services/ai', () => ({
 }));
 
 describe('RecipeGeneratorPage', () => {
+  const renderPage = (): void => {
+    render(
+      <MemoryRouter>
+        <RecipeGeneratorPage />
+      </MemoryRouter>
+    );
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -23,7 +33,7 @@ describe('RecipeGeneratorPage', () => {
 
     generateRecipeMock.mockReturnValue(pendingRecipe);
 
-    render(<RecipeGeneratorPage />);
+    renderPage();
 
     await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
     const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
@@ -32,7 +42,7 @@ describe('RecipeGeneratorPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Generar receta' }));
 
-    expect(screen.getByRole('button', { name: 'Generando...' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Generando...' })).toBeInTheDocument();
 
     resolveRecipe({
       id: 'recipe-1',
@@ -65,7 +75,7 @@ describe('RecipeGeneratorPage', () => {
         ],
         servings: 2,
         notes: '',
-      });
+      }, expect.objectContaining({ signal: expect.anything() }));
     });
 
     expect(await screen.findByText('Sopa de tomate')).toBeInTheDocument();
@@ -76,7 +86,7 @@ describe('RecipeGeneratorPage', () => {
     const user = userEvent.setup();
     const generateRecipeMock = vi.mocked(generateRecipe);
 
-    render(<RecipeGeneratorPage />);
+    renderPage();
 
     await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
     const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
@@ -88,7 +98,7 @@ describe('RecipeGeneratorPage', () => {
     await user.click(screen.getByRole('button', { name: 'Generar receta' }));
 
     expect(generateRecipeMock).not.toHaveBeenCalled();
-    expect(screen.getByText('Revisá las porciones antes de generar la receta.')).toBeInTheDocument();
+    expect(screen.getAllByText('Ingresá un número de porciones mayor que 0.')).toHaveLength(2);
   });
 
   it('shows a safe error when the recipe request fails on the server', async () => {
@@ -97,7 +107,7 @@ describe('RecipeGeneratorPage', () => {
 
     generateRecipeMock.mockRejectedValue(new Error('No pudimos generar la receta. Intentalo nuevamente.'));
 
-    render(<RecipeGeneratorPage />);
+    renderPage();
 
     await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
     const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
@@ -108,5 +118,71 @@ describe('RecipeGeneratorPage', () => {
 
     expect(await screen.findByText('No pudimos generar la receta. Intentalo nuevamente.')).toBeInTheDocument();
     expect(screen.queryByText('Sopa de tomate')).not.toBeInTheDocument();
+  });
+
+  it('keeps only the latest submitted recipe result when requests resolve out of order', async () => {
+    const user = userEvent.setup();
+    const generateRecipeMock = vi.mocked(generateRecipe);
+    let resolveFirst!: (value: Awaited<ReturnType<typeof generateRecipe>>) => void;
+    let resolveSecond!: (value: Awaited<ReturnType<typeof generateRecipe>>) => void;
+
+    generateRecipeMock
+      .mockReturnValueOnce(new Promise((resolve) => {
+        resolveFirst = resolve;
+      }))
+      .mockReturnValueOnce(new Promise((resolve) => {
+        resolveSecond = resolve;
+      }));
+
+    renderPage();
+
+    await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
+    const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '2');
+
+    const submitButton = screen.getByRole('button', { name: 'Generar receta' });
+    fireEvent.click(submitButton);
+    fireEvent.click(submitButton);
+
+    expect(generateRecipeMock).toHaveBeenCalledTimes(2);
+
+    resolveSecond({
+      id: 'recipe-2',
+      title: 'Sopa de tomate renovada',
+      ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
+      instructions: ['Picar', 'Cocinar'],
+      preparationTimeMinutes: 12,
+      totalTimeMinutes: 22,
+      servings: 2,
+      difficulty: 'easy',
+      macros: {
+        calories: 240,
+        protein: 5,
+        carbohydrates: 28,
+        fats: 7,
+      },
+    });
+
+    expect(await screen.findByText('Sopa de tomate renovada')).toBeInTheDocument();
+
+    resolveFirst({
+      id: 'recipe-1',
+      title: 'Sopa de tomate antigua',
+      ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
+      instructions: ['Cortar', 'Cocinar'],
+      preparationTimeMinutes: 15,
+      totalTimeMinutes: 25,
+      servings: 2,
+      difficulty: 'easy',
+      macros: {
+        calories: 250,
+        protein: 6,
+        carbohydrates: 30,
+        fats: 8,
+      },
+    });
+
+    expect(screen.queryByText('Sopa de tomate antigua')).not.toBeInTheDocument();
   });
 });

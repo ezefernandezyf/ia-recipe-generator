@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { createDefaultRecipeRequestState, type IngredientFormRow, type IngredientFormRows } from '../model/defaults';
 import type { Ingredient } from '../model/recipe';
-import { validateIngredients } from '../model/validation';
+import { hasIngredientErrors, validateIngredients, validateServings } from '../model/validation';
 import { generateRecipe } from '../services/ai';
 import IngredientForm from './IngredientForm';
 import RecipeRequestPanel from './RecipeRequestPanel';
@@ -61,6 +61,8 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recipe, setRecipe] = useState<Awaited<ReturnType<typeof generateRecipe>> | null>(null);
+  const requestSequenceRef = useRef(0);
+  const activeAbortControllerRef = useRef<AbortController | null>(null);
 
   const handleIngredientsChange = (ingredients: IngredientFormRows) => {
     setFormState((prev) => {
@@ -83,7 +85,7 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
   const handleSubmit = async () => {
     const { ingredients, notes, servings } = formState;
     const validationResults = validateIngredients(ingredients);
-    const hasErrors = validationResults.some((item) => item.name || item.quantity || item.unit);
+    const hasErrors = validationResults.some(hasIngredientErrors);
 
     if (hasErrors) {
       console.error('Recipe generation blocked by ingredient validation errors:', validationResults);
@@ -91,8 +93,10 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
       return;
     }
 
-    if (servings === null || !Number.isInteger(servings) || servings <= 0) {
-      setError('Revisá las porciones antes de generar la receta.');
+    const servingsError = validateServings(servings);
+
+    if (servingsError) {
+      setError(servingsError);
       return;
     }
 
@@ -101,56 +105,97 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
       return;
     }
 
+    const requestId = requestSequenceRef.current + 1;
+    requestSequenceRef.current = requestId;
+
+    activeAbortControllerRef.current?.abort();
+
+    const abortController = new AbortController();
+    activeAbortControllerRef.current = abortController;
+
     setIsLoading(true);
     setError(null);
+    setRecipe(null);
+
+    const normalizedServings = servings ?? undefined;
 
     try {
       const generated = await generateRecipe({
         ingredients: mapRowsToIngredients(ingredients),
-        servings,
+        servings: normalizedServings,
         notes,
-      });
+      }, { signal: abortController.signal });
+
+      if (requestSequenceRef.current !== requestId) {
+        return;
+      }
+
       setRecipe(generated);
     } catch (caught) {
+      if (requestSequenceRef.current !== requestId) {
+        return;
+      }
+
+      if (caught instanceof DOMException && caught.name === 'AbortError') {
+        return;
+      }
+
       console.error('Recipe generation failed:', caught);
       setError(getRecipeGenerationErrorMessage(caught));
     } finally {
+      if (requestSequenceRef.current !== requestId) {
+        return;
+      }
+
+      activeAbortControllerRef.current = null;
       setIsLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <header className="space-y-2">
-          <h1 className="text-2xl font-bold text-slate-900">Generador de Recetas</h1>
-          <p className="text-sm text-slate-600">Ingresa ingredientes y preferencias para obtener una receta sugerida.</p>
-          <Link to="/debug/recipe-generator" className="inline-flex text-sm font-medium text-cyan-700 hover:text-cyan-900">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(217,119,6,0.12),transparent_30%),linear-gradient(180deg,#f8f5ef_0%,#f3efe6_100%)] px-4 py-8 text-stone-900">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <header className="rounded-3xl border border-stone-200 bg-white/85 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.08)] backdrop-blur">
+          <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+            <span className="rounded-full bg-secondary px-3 py-1 text-white">IA Recipe Generator</span>
+            <span>Reliable generation</span>
+            <span>Zod 4</span>
+            <span>Editorial UI</span>
+          </div>
+          <div className="mt-4 space-y-3">
+            <h1 className="text-3xl font-semibold tracking-tight text-stone-950 md:text-4xl">Generador de Recetas</h1>
+            <p className="max-w-3xl text-sm leading-6 text-stone-600">Ingresá ingredientes y preferencias para obtener una receta sugerida, con cancelación de requests viejas y una interfaz más clara.</p>
+          </div>
+          <Link to="/debug/recipe-generator" className="mt-4 inline-flex text-sm font-semibold text-primary transition hover:text-secondary">
             Abrir smoke test de API
           </Link>
         </header>
 
-        <IngredientForm rows={formState.ingredients} onChange={handleIngredientsChange} />
-        <RecipeRequestPanel
-          servings={formState.servings}
-          notes={formState.notes}
-          onServingsChange={handleServingsChange}
-          onNotesChange={handleNotesChange}
-        />
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-6">
+            <IngredientForm rows={formState.ingredients} onChange={handleIngredientsChange} />
+            <RecipeRequestPanel
+              servings={formState.servings}
+              notes={formState.notes}
+              onServingsChange={handleServingsChange}
+              onNotesChange={handleNotesChange}
+            />
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-stone-200 bg-white/90 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                {isLoading ? 'Generando...' : 'Generar receta'}
+              </button>
+              {error ? <span className="text-sm font-medium text-rose-600">{error}</span> : <span className="text-sm text-stone-500">La última solicitud siempre gana.</span>}
+            </div>
+          </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={handleSubmit}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? 'Generando...' : 'Generar receta'}
-          </button>
-          {error ? <span className="text-sm text-rose-600">{error}</span> : null}
+          <div className="space-y-6">
+            {recipe ? <RecipeResult recipe={recipe} /> : <div className="rounded-3xl border border-dashed border-stone-300 bg-white/75 p-8 text-sm text-stone-500 shadow-[0_16px_40px_rgba(15,23,42,0.04)]">Todavía no hay receta generada. Completá el formulario y ejecutá la generación para ver el resultado acá.</div>}
+          </div>
         </div>
-
-        {recipe ? <RecipeResult recipe={recipe} /> : null}
       </div>
     </main>
   );
