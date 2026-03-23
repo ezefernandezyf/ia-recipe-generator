@@ -31,6 +31,21 @@ describe('IngredientForm', () => {
     expect(nextRows[1].id).toBe('row-1');
   });
 
+  it('adds a new row when the form starts empty', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+
+    render(<IngredientForm rows={[]} onChange={onChange} />);
+
+    await user.click(screen.getByRole('button', { name: 'Agregar ingrediente' }));
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const nextRows = onChange.mock.calls[0][0] as IngredientFormRows;
+    expect(nextRows).toHaveLength(1);
+    expect(nextRows[0].name).toBe('');
+    expect(nextRows[0].quantity).toBeNull();
+  });
+
   it('removes a row when multiple rows exist', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

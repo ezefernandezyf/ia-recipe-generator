@@ -71,7 +71,7 @@ describe('recipe generation provider selection', () => {
             })
         );
 
-        expect(mocks.groq).toHaveBeenCalledWith('qwen/qwen3-32b');
+        expect(mocks.groq).toHaveBeenCalledWith('openai/gpt-oss-20b');
         expect(mocks.google).not.toHaveBeenCalled();
         expect(mocks.generateText).toHaveBeenCalledWith(
             expect.objectContaining({

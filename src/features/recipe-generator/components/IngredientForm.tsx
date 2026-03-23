@@ -14,11 +14,7 @@ interface IngredientFormProps {
 type IngredientFormRowPatch = Partial<Pick<IngredientFormRow, 'name' | 'quantity' | 'unit' | 'notes'>>;
 
 const ensureIngredientFormRows = (rows: IngredientFormRow[]): IngredientFormRows => {
-    if (rows.length === 0) {
-        throw new Error('Ingredient form must contain at least one row.');
-    }
-
-    return rows as IngredientFormRows;
+    return rows;
 };
 
 const IngredientForm = ({ rows, onChange }: IngredientFormProps): IngredientFormView => {
@@ -79,7 +75,7 @@ const IngredientForm = ({ rows, onChange }: IngredientFormProps): IngredientForm
                         key={row.id}
                         row={row}
                         errors={rowErrors[index]}
-                        disableRemove={rows.length === 1}
+                        disableRemove={rows.length <= 1}
                         onChange={updateRow}
                         onRemove={removeRow}
                     />
