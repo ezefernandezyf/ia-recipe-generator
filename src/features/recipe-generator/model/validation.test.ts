@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateIngredient } from './validation';
+import { validateIngredient, validateServings } from './validation';
 
 describe('validateIngredient', () => {
   it('returns quantity error when quantity is zero or negative', () => {
@@ -54,5 +54,11 @@ describe('validateIngredient', () => {
     });
 
     expect(result).toEqual({});
+  });
+
+  it('returns a servings error for invalid values', () => {
+    expect(validateServings(null)).toBe('Ingresá un número de porciones mayor que 0.');
+    expect(validateServings(0)).toBe('Ingresá un número de porciones mayor que 0.');
+    expect(validateServings(2)).toBeNull();
   });
 });

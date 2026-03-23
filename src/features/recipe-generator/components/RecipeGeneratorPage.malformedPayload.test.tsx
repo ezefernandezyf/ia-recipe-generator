@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import RecipeGeneratorPage from './RecipeGeneratorPage';
 
 const fetchMock = vi.fn();
@@ -30,7 +31,11 @@ describe('RecipeGeneratorPage malformed payload regression', () => {
 
     const user = userEvent.setup();
 
-    render(<RecipeGeneratorPage />);
+    render(
+      <MemoryRouter>
+        <RecipeGeneratorPage />
+      </MemoryRouter>
+    );
 
     await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
     const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });

@@ -9,6 +9,10 @@ interface GenerateRecipeRequest {
     notes?: string;
 }
 
+interface GenerateRecipeOptions {
+    signal?: AbortSignal;
+}
+
 interface GenerateRecipeResponse {
     recipe: unknown;
 }
@@ -46,7 +50,8 @@ const requestJson = async <T>(input: RequestInfo | URL, init?: RequestInit): Pro
 };
 
 export const generateRecipe = async (
-    request: GenerateRecipeRequest
+    request: GenerateRecipeRequest,
+    options?: GenerateRecipeOptions
 ): Promise<Recipe> => {
     try {
         const response = await requestJson<GenerateRecipeResponse>(
@@ -57,6 +62,7 @@ export const generateRecipe = async (
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(request),
+                signal: options?.signal,
             }
         );
 

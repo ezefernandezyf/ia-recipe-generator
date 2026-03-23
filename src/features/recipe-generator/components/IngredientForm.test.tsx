@@ -27,7 +27,8 @@ describe('IngredientForm', () => {
     expect(onChange).toHaveBeenCalledTimes(1);
     const nextRows = onChange.mock.calls[0][0] as IngredientFormRows;
     expect(nextRows).toHaveLength(2);
-    expect(nextRows[0].id).toBe('row-1');
+    expect(nextRows[0].id).not.toBe('row-1');
+    expect(nextRows[1].id).toBe('row-1');
   });
 
   it('removes a row when multiple rows exist', async () => {

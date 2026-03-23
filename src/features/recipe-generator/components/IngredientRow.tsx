@@ -63,21 +63,22 @@ const IngredientRow = ({
     };
 
     return (
-        <div className="grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-white p-4 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-3 rounded-2xl border border-stone-200 bg-stone-50/80 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)] md:grid-cols-12">
             <div className="md:col-span-4">
-                <label htmlFor={nameInputId} className="mb-1 block text-sm font-medium text-slate-700">Ingrediente</label>
+                <label htmlFor={nameInputId} className="mb-1 block text-sm font-medium text-stone-700">Ingrediente</label>
                 <input
                     id={nameInputId}
                     value={row.name}
                     onChange={handleNameChange}
                     placeholder="Ej: Tomate"
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+                    aria-invalid={Boolean(errors.name)}
+                    className="w-full rounded-full border border-stone-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
-                {errors.name ? <p className="mt-1 text-xs text-rose-600">{errors.name}</p> : null}
+                {errors.name ? <p className="mt-1 text-xs font-medium text-rose-600">{errors.name}</p> : null}
             </div>
 
             <div className="md:col-span-2">
-                <label htmlFor={quantityInputId} className="mb-1 block text-sm font-medium text-slate-700">Cantidad</label>
+                <label htmlFor={quantityInputId} className="mb-1 block text-sm font-medium text-stone-700">Cantidad</label>
                 <input
                     id={quantityInputId}
                     type="number"
@@ -85,18 +86,20 @@ const IngredientRow = ({
                     step="0.1"
                     value={row.quantity ?? ''}
                     onChange={handleQuantityChange}
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+                    aria-invalid={Boolean(errors.quantity)}
+                    className="w-full rounded-full border border-stone-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
-                {errors.quantity ? <p className="mt-1 text-xs text-rose-600">{errors.quantity}</p> : null}
+                {errors.quantity ? <p className="mt-1 text-xs font-medium text-rose-600">{errors.quantity}</p> : null}
             </div>
 
             <div className="md:col-span-2">
-                <label htmlFor={unitSelectId} className="mb-1 block text-sm font-medium text-slate-700">Unidad</label>
+                <label htmlFor={unitSelectId} className="mb-1 block text-sm font-medium text-stone-700">Unidad</label>
                 <select
                     id={unitSelectId}
                     value={row.unit}
                     onChange={handleUnitChange}
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+                    aria-invalid={Boolean(errors.unit)}
+                    className="w-full rounded-full border border-stone-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 >
                     {ALLOWED_INGREDIENT_UNITS.map((unit) => (
                         <option key={unit} value={unit}>
@@ -104,17 +107,17 @@ const IngredientRow = ({
                         </option>
                     ))}
                 </select>
-                {errors.unit ? <p className="mt-1 text-xs text-rose-600">{errors.unit}</p> : null}
+                {errors.unit ? <p className="mt-1 text-xs font-medium text-rose-600">{errors.unit}</p> : null}
             </div>
 
             <div className="md:col-span-3">
-                <label htmlFor={notesInputId} className="mb-1 block text-sm font-medium text-slate-700">Notas</label>
+                <label htmlFor={notesInputId} className="mb-1 block text-sm font-medium text-stone-700">Notas</label>
                 <input
                     id={notesInputId}
                     value={row.notes}
                     onChange={handleNotesChange}
                     placeholder="Opcional"
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+                    className="w-full rounded-full border border-stone-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
             </div>
 
@@ -123,7 +126,7 @@ const IngredientRow = ({
                     type="button"
                     disabled={disableRemove}
                     onClick={() => onRemove(row.id)}
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-full border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Quitar
                 </button>
