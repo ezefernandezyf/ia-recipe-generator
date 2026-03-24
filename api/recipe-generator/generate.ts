@@ -60,6 +60,30 @@ const errorResponse = (message: string, status: number): Response => {
     return Response.json({ error: message }, { status });
 };
 
+const handleGenerateRecipeRequest = async (request: Request): Promise<Response> => {
+    if (request.method !== 'POST') {
+        return Response.json({ error: 'Method Not Allowed' }, { status: 405 });
+    }
+
+    const body = await request.json();
+    const parsed = requestSchema.safeParse(body);
+
+    if (!parsed.success) {
+        return errorResponse('Solicitud de receta invalida.', 400);
+    }
+
+    const result = await generateText({
+        model: resolveRecipeModel(),
+        system: 'Sos un chef experto que responde solo con JSON valido.',
+        prompt: buildPrompt(parsed.data),
+        output: Output.object({
+            schema: recipeSchema,
+        }),
+    });
+
+    return Response.json({ recipe: normalizeRecipeOutput(result.output) });
+};
+
 const normalizeRecipeOutput = (recipe: z.infer<typeof recipeSchema>) => {
     return {
         ...recipe,
@@ -75,23 +99,7 @@ const normalizeRecipeOutput = (recipe: z.infer<typeof recipeSchema>) => {
 
 export async function POST(request: Request): Promise<Response> {
     try {
-        const body = await request.json();
-        const parsed = requestSchema.safeParse(body);
-
-        if (!parsed.success) {
-            return errorResponse('Solicitud de receta invalida.', 400);
-        }
-
-        const result = await generateText({
-            model: resolveRecipeModel(),
-            system: 'Sos un chef experto que responde solo con JSON valido.',
-            prompt: buildPrompt(parsed.data),
-            output: Output.object({
-                schema: recipeSchema,
-            }),
-        });
-
-        return Response.json({ recipe: normalizeRecipeOutput(result.output) });
+        return await handleGenerateRecipeRequest(request);
     } catch (error) {
         if (isMissingAiProviderError(error)) {
             return errorResponse(error.message, 503);
@@ -105,3 +113,9 @@ export async function POST(request: Request): Promise<Response> {
         return errorResponse('No pudimos generar la receta en este momento.', 502);
     }
 }
+
+export default {
+    fetch(request: Request): Promise<Response> {
+        return POST(request);
+    },
+};

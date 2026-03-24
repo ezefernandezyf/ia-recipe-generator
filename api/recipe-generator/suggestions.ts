@@ -10,6 +10,27 @@ const errorResponse = (message: string, status: number): Response => {
     return Response.json({ error: message }, { status });
 };
 
+const handleSuggestionsRequest = async (request: Request): Promise<Response> => {
+    if (request.method !== 'GET') {
+        return Response.json({ error: 'Method Not Allowed' }, { status: 405 });
+    }
+
+    const url = new URL(request.url);
+    const diet = url.searchParams.get('diet');
+    const maxPreparationTimeMinutes = url.searchParams.get('maxPreparationTimeMinutes');
+
+    const result = await generateText({
+        model: resolveRecipeModel(),
+        system: 'Sos un asistente que sugiere ideas de recetas breves.',
+        prompt: buildPrompt(diet, maxPreparationTimeMinutes),
+        output: Output.object({
+            schema: suggestionsSchema,
+        }),
+    });
+
+    return Response.json(result.output);
+};
+
 const buildPrompt = (diet: string | null, maxPreparationTimeMinutes: string | null): string => {
     return [
         'Genera sugerencias cortas de recetas y devuelvelas como JSON con una propiedad suggestions.',
@@ -23,20 +44,7 @@ const buildPrompt = (diet: string | null, maxPreparationTimeMinutes: string | nu
 
 export async function GET(request: Request): Promise<Response> {
     try {
-        const url = new URL(request.url);
-        const diet = url.searchParams.get('diet');
-        const maxPreparationTimeMinutes = url.searchParams.get('maxPreparationTimeMinutes');
-
-        const result = await generateText({
-            model: resolveRecipeModel(),
-            system: 'Sos un asistente que sugiere ideas de recetas breves.',
-            prompt: buildPrompt(diet, maxPreparationTimeMinutes),
-            output: Output.object({
-                schema: suggestionsSchema,
-            }),
-        });
-
-        return Response.json(result.output);
+        return await handleSuggestionsRequest(request);
     } catch (error) {
         if (isMissingAiProviderError(error)) {
             return errorResponse(error.message, 503);
@@ -50,3 +58,9 @@ export async function GET(request: Request): Promise<Response> {
         return errorResponse('No pudimos obtener sugerencias por ahora.', 502);
     }
 }
+
+export default {
+    fetch(request: Request): Promise<Response> {
+        return GET(request);
+    },
+};
