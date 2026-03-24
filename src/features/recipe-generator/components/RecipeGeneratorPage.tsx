@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import type { ReactElement } from 'react';
-import { Link } from 'react-router-dom';
 import { createDefaultRecipeRequestState, type IngredientFormRow, type IngredientFormRows } from '../model/defaults';
 import type { Ingredient } from '../model/recipe';
 import { hasIngredientErrors, validateIngredients, validateServings } from '../model/validation';
@@ -126,11 +125,14 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
     const normalizedServings = servings ?? undefined;
 
     try {
-      const generated = await generateRecipe({
-        ingredients: mapRowsToIngredients(ingredients),
-        servings: normalizedServings,
-        notes,
-      }, { signal: abortController.signal });
+      const generated = await generateRecipe(
+        {
+          ingredients: mapRowsToIngredients(ingredients),
+          servings: normalizedServings,
+          notes,
+        },
+        { signal: abortController.signal }
+      );
 
       if (requestSequenceRef.current !== requestId) {
         return;
@@ -164,17 +166,12 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
         <header className="rounded-3xl border border-stone-200 bg-white/85 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.08)] backdrop-blur">
           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
             <span className="rounded-full bg-secondary px-3 py-1 text-white">IA Recipe Generator</span>
-            <span>Reliable generation</span>
-            <span>Zod 4</span>
-            <span>Editorial UI</span>
+            <span>Recetas ajustadas a tus ingredientes</span>
           </div>
           <div className="mt-4 space-y-3">
             <h1 className="text-3xl font-semibold tracking-tight text-stone-950 md:text-4xl">Generador de Recetas</h1>
-            <p className="max-w-3xl text-sm leading-6 text-stone-600">Ingresá ingredientes y preferencias para obtener una receta sugerida, con cancelación de requests viejas y una interfaz más clara.</p>
+            <p className="max-w-3xl text-sm leading-6 text-stone-600">Ingresá ingredientes y preferencias para obtener una receta sugerida con una presentación clara y lista para usar.</p>
           </div>
-          <Link to="/debug/recipe-generator" className="mt-4 inline-flex text-sm font-semibold text-primary transition hover:text-secondary">
-            Abrir smoke test de API
-          </Link>
         </header>
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -190,11 +187,12 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                disabled={isLoading}
+                className="rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading ? 'Generando...' : 'Generar receta'}
               </button>
-              {error ? <span className="text-sm font-medium text-rose-600">{error}</span> : <span className="text-sm text-stone-500">La última solicitud siempre gana.</span>}
+              {error ? <span className="text-sm font-medium text-rose-600">{error}</span> : <span className="text-sm text-stone-500">Completá el formulario y generá tu receta.</span>}
             </div>
           </div>
 

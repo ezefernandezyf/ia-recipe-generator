@@ -2,6 +2,10 @@
 
 Aplicacion web para generar recetas personalizadas a partir de ingredientes y preferencias del usuario. El proyecto esta hecho con React 19, TypeScript y Tailwind CSS 4, y sigue un flujo de trabajo SDD con documentacion en `docs/specs/`.
 
+## Primer release
+
+La aplicacion esta pensada para usuarios finales: la pantalla publica solo muestra el generador de recetas, sin paneles de debug ni rutas internas.
+
 ## Que hace
 
 - Permite cargar ingredientes de forma interactiva.
@@ -26,6 +30,7 @@ Aplicacion web para generar recetas personalizadas a partir de ingredientes y pr
 - `src/AppRoutes.tsx` - arbol de rutas de la aplicacion.
 - `src/app.tsx` - composicion de la app.
 - `src/main.tsx` - punto de entrada y montaje del root.
+- `public/` - favicon, robots y sitemap para la publicacion.
 - `docs/specs/` - PRD, diseno, tareas y trazabilidad SDD.
 - `.github/skills/` - skills auxiliares del proyecto.
 
@@ -61,11 +66,9 @@ Luego abrilo en `http://localhost:5173`.
 
 El servidor de desarrollo también expone las rutas internas de IA en `/api/recipe-generator/*`, así que la UI puede generar recetas sin un backend adicional durante `npm run dev` o `npm run preview`.
 
-Para depurar credenciales o proveedor desde el navegador, usá `/debug/recipe-generator`. Ese panel permite elegir el servicio, pegar una API key temporal y probar la respuesta completa del endpoint en una sola pantalla.
-
 ## Variables de entorno para IA
 
-El generador ahora usa rutas internas en el servidor. Defini estas variables en `.env.local`:
+El generador usa rutas internas en el servidor. Defini estas variables en `.env.local`:
 
 ```bash
 AI_PROVIDER=groq
@@ -87,13 +90,12 @@ npm run preview
 
 - El proyecto incluye pruebas unitarias para validacion y mapeo de dominio.
 - Tambien incluye pruebas de componente e integracion para el flujo principal.
-- La verificacion del cambio se hace con build, typecheck y tests.
+- La verificacion del cambio se hace con build y tests.
 
 ## Documentacion del proyecto
 
 - `docs/specs/recipe_gen_prd.md` - especificacion funcional.
-- `docs/specs/design.md` - decisiones de arquitectura.
-- `docs/specs/tasks.md` - checklist de implementacion.
+- `docs/specs/AI-Recipe-Generator/` - especificacion, diseño y tareas del release.
 
 ## Contribuciones
 

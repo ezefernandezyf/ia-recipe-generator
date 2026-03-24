@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">IA Recipe Generator</title>
+  <desc id="desc">Icono de una hoja y vapor de cocina sobre un fondo naranja</desc>
+  <rect width="64" height="64" rx="16" fill="#ea580c" />
+  <path d="M20 44c0-8 6-18 14-22 3-1 6-2 10-2-2 6-4 10-8 14-3 3-7 6-12 8-1 1-2 1-4 2z" fill="#fff7ed" opacity="0.95" />
+  <path d="M28 18c0 3-2 4-2 7 0 2 1 3 2 5" fill="none" stroke="#fff7ed" stroke-width="3" stroke-linecap="round" />
+  <path d="M36 16c0 3-2 4-2 7 0 2 1 3 2 5" fill="none" stroke="#fff7ed" stroke-width="3" stroke-linecap="round" opacity="0.9" />
+</svg>

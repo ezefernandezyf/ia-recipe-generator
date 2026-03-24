@@ -60,7 +60,10 @@ describe('POST /api/recipe-generator/generate', () => {
         );
 
         expect(mocks.resolveRecipeModel).toHaveBeenCalled();
-        expect(mocks.generateText).toHaveBeenCalled();
+        expect(mocks.generateText).toHaveBeenCalledWith(expect.objectContaining({
+            model: 'recipe-model',
+            prompt: expect.stringContaining('usa solo la porcion necesaria segun las porciones solicitadas'),
+        }));
         expect(response.status).toBe(200);
         await expect(response.json()).resolves.toMatchObject({
             recipe: expect.objectContaining({

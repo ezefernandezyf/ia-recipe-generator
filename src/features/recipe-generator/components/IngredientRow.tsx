@@ -121,12 +121,12 @@ const IngredientRow = ({
                 />
             </div>
 
-            <div className="md:col-span-1 md:flex md:items-end">
+            <div className="md:col-span-2 md:flex md:items-end">
                 <button
                     type="button"
                     disabled={disableRemove}
                     onClick={() => onRemove(row.id)}
-                    className="w-full rounded-full border border-stone-300 px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 md:w-auto md:min-w-28 md:self-end"
                 >
                     Quitar
                 </button>
