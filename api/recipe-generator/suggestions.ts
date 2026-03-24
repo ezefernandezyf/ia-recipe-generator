@@ -1,6 +1,6 @@
 import { NoObjectGeneratedError, Output, generateText } from 'ai';
 import { z } from 'zod';
-import { isMissingAiProviderError, resolveRecipeModel } from './_provider';
+import { isMissingAiProviderError, resolveRecipeModel } from './_provider.js';
 
 const suggestionsSchema = z.object({
     suggestions: z.array(z.string().min(1)).min(1),

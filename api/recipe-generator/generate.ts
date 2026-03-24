@@ -1,6 +1,6 @@
 import { NoObjectGeneratedError, Output, generateText } from 'ai';
 import { z } from 'zod';
-import { isMissingAiProviderError, resolveRecipeModel } from './_provider';
+import { isMissingAiProviderError, resolveRecipeModel } from './_provider.js';
 
 const ingredientUnitSchema = z.enum(['g', 'kg', 'ml', 'l', 'cup', 'tbsp', 'tsp', 'unit']);
 const difficultySchema = z.enum(['easy', 'medium', 'hard']);
