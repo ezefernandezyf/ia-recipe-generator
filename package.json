@@ -1,6 +1,7 @@
 {
   "name": "recipe-generator-prd",
   "version": "1.0.0",
+  "type": "module",
   "description": "A recipe generator application powered by AI, built with React, TypeScript, and Tailwind CSS.",
   "main": "src/main.tsx",
   "scripts": {
