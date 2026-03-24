@@ -2,10 +2,6 @@
 
 Aplicacion web para generar recetas personalizadas a partir de ingredientes y preferencias del usuario. El proyecto esta hecho con React 19, TypeScript y Tailwind CSS 4, y sigue un flujo de trabajo SDD con documentacion en `docs/specs/`.
 
-## Primer release
-
-La aplicacion esta pensada para usuarios finales: la pantalla publica solo muestra el generador de recetas, sin paneles de debug ni rutas internas.
-
 ## Que hace
 
 - Permite cargar ingredientes de forma interactiva.
@@ -14,11 +10,16 @@ La aplicacion esta pensada para usuarios finales: la pantalla publica solo muest
 - Mapea la respuesta del servicio a un modelo de dominio tipado.
 - Muestra el resultado con ingredientes, instrucciones, macros, tiempo y dificultad.
 
+## Deploy
+
+La app publicada está disponible en [https://chefcitoia.vercel.app](https://chefcitoia.vercel.app).
+
 ## Tecnologias
 
 - React 19
 - TypeScript
 - Tailwind CSS 4
+- Zod 4
 - Vite 5
 - Vitest + Testing Library
 - React Router DOM
@@ -27,6 +28,8 @@ La aplicacion esta pensada para usuarios finales: la pantalla publica solo muest
 
 - `src/` - codigo fuente de la aplicacion.
 - `src/features/recipe-generator/` - feature principal de generacion de recetas.
+- `src/features/privacy-page/` - pagina simple de privacidad.
+- `src/components/` - layout y componentes compartidos.
 - `src/AppRoutes.tsx` - arbol de rutas de la aplicacion.
 - `src/app.tsx` - composicion de la app.
 - `src/main.tsx` - punto de entrada y montaje del root.
@@ -68,7 +71,7 @@ El servidor de desarrollo también expone las rutas internas de IA en `/api/reci
 
 ## Variables de entorno para IA
 
-El generador usa rutas internas en el servidor. Defini estas variables en `.env.local`:
+El generador usa rutas internas en el servidor. Defini estas variables en `.env.local` y en Vercel:
 
 ```bash
 AI_PROVIDER=groq
@@ -77,6 +80,7 @@ GOOGLE_GENERATIVE_AI_API_KEY=tu_clave_de_google
 ```
 
 - `AI_PROVIDER` acepta `groq` o `google`.
+- Si `AI_PROVIDER` no está definido, el backend intenta usar el proveedor que tenga una API key configurada.
 - Las claves no deben exponerse con prefijos `VITE_*`.
 - Si usas un solo proveedor, solo completá la variable correspondiente.
 

@@ -39,4 +39,13 @@ describe('resolveRecipeModel', () => {
         expect(mocks.google).toHaveBeenCalledWith('gemini-2.5-flash');
         expect(model).toBe('google-model');
     });
+
+    it('falls back to Google when AI_PROVIDER is unset and only the Google key is configured', () => {
+        vi.stubEnv('GOOGLE_GENERATIVE_AI_API_KEY', 'google-key');
+
+        const model = resolveRecipeModel();
+
+        expect(mocks.google).toHaveBeenCalledWith('gemini-2.5-flash');
+        expect(model).toBe('google-model');
+    });
 });

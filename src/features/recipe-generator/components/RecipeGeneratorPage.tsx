@@ -161,7 +161,7 @@ const RecipeGeneratorPage = (): RecipeGeneratorPageView => {
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(217,119,6,0.12),transparent_30%),linear-gradient(180deg,#f8f5ef_0%,#f3efe6_100%)] px-4 py-8 text-stone-900">
+    <main className="min-h-full bg-[radial-gradient(circle_at_top,rgba(217,119,6,0.12),transparent_30%),linear-gradient(180deg,#f8f5ef_0%,#f3efe6_100%)] px-4 py-8 text-stone-900">
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="rounded-3xl border border-stone-200 bg-white/85 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.08)] backdrop-blur">
           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
