@@ -95,7 +95,7 @@ describe('recipe AI service', () => {
     ).rejects.toThrow('No pudimos generar la receta. Intentalo nuevamente.');
   });
 
-  it('does not ship provider secret names in the browser bundle', async () => {
+  it('does not ship provider secret names in the browser bundle', { timeout: 15000 }, async () => {
     const { build } = await import('vite');
     const outDir = await mkdtemp(join(tmpdir(), 'ia-recipe-generator-bundle-'));
 

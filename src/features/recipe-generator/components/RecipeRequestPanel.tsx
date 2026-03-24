@@ -72,7 +72,7 @@ const RecipeRequestPanel = ({
                     aria-valuemin={1}
                     aria-valuenow={servings ?? undefined}
                     aria-invalid={Boolean(servingsError)}
-                    className="w-40 rounded-full border border-stone-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="w-full rounded-full border border-stone-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 sm:w-40"
                 />
                 {servingsError ? <p className="mt-1 text-xs font-medium text-rose-600">{servingsError}</p> : null}
             </div>

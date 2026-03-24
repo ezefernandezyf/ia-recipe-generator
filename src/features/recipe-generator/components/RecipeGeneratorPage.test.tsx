@@ -43,6 +43,7 @@ describe('RecipeGeneratorPage', () => {
     await user.click(screen.getByRole('button', { name: 'Generar receta' }));
 
     expect(screen.getByRole('button', { name: 'Generando...' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Generando...' })).toBeDisabled();
 
     resolveRecipe({
       id: 'recipe-1',
@@ -139,7 +140,51 @@ describe('RecipeGeneratorPage', () => {
     expect(screen.queryByText('Sopa de tomate')).not.toBeInTheDocument();
   });
 
-  it('keeps only the latest submitted recipe result when requests resolve out of order', async () => {
+  it('prevents a second submit while a request is loading', async () => {
+    const user = userEvent.setup();
+    const generateRecipeMock = vi.mocked(generateRecipe);
+    let resolveRecipe!: (value: Awaited<ReturnType<typeof generateRecipe>>) => void;
+
+    generateRecipeMock
+      .mockReturnValueOnce(new Promise((resolve) => {
+        resolveRecipe = resolve;
+      }));
+
+    renderPage();
+
+    await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
+    const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '2');
+
+    const submitButton = screen.getByRole('button', { name: 'Generar receta' });
+    fireEvent.click(submitButton);
+    fireEvent.click(submitButton);
+
+    expect(generateRecipeMock).toHaveBeenCalledTimes(1);
+    expect(submitButton).toBeDisabled();
+
+    resolveRecipe({
+      id: 'recipe-1',
+      title: 'Sopa de tomate reciente',
+      ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
+      instructions: ['Picar', 'Cocinar'],
+      preparationTimeMinutes: 12,
+      totalTimeMinutes: 22,
+      servings: 2,
+      difficulty: 'easy',
+      macros: {
+        calories: 240,
+        protein: 5,
+        carbohydrates: 28,
+        fats: 7,
+      },
+    });
+
+    expect(await screen.findByText('Sopa de tomate reciente')).toBeInTheDocument();
+  });
+
+  it('allows a new submit after the previous request completes', async () => {
     const user = userEvent.setup();
     const generateRecipeMock = vi.mocked(generateRecipe);
     let resolveFirst!: (value: Awaited<ReturnType<typeof generateRecipe>>) => void;
@@ -162,7 +207,27 @@ describe('RecipeGeneratorPage', () => {
 
     const submitButton = screen.getByRole('button', { name: 'Generar receta' });
     fireEvent.click(submitButton);
-    fireEvent.click(submitButton);
+
+    resolveFirst({
+      id: 'recipe-1',
+      title: 'Sopa de tomate antigua',
+      ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
+      instructions: ['Cortar', 'Cocinar'],
+      preparationTimeMinutes: 15,
+      totalTimeMinutes: 25,
+      servings: 2,
+      difficulty: 'easy',
+      macros: {
+        calories: 250,
+        protein: 6,
+        carbohydrates: 30,
+        fats: 8,
+      },
+    });
+
+    expect(await screen.findByText('Sopa de tomate antigua')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Generar receta' }));
 
     expect(generateRecipeMock).toHaveBeenCalledTimes(2);
 
@@ -184,84 +249,15 @@ describe('RecipeGeneratorPage', () => {
     });
 
     expect(await screen.findByText('Sopa de tomate renovada')).toBeInTheDocument();
-
-    resolveFirst({
-      id: 'recipe-1',
-      title: 'Sopa de tomate antigua',
-      ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
-      instructions: ['Cortar', 'Cocinar'],
-      preparationTimeMinutes: 15,
-      totalTimeMinutes: 25,
-      servings: 2,
-      difficulty: 'easy',
-      macros: {
-        calories: 250,
-        protein: 6,
-        carbohydrates: 30,
-        fats: 8,
-      },
-    });
-
-    expect(screen.queryByText('Sopa de tomate antigua')).not.toBeInTheDocument();
-  });
-
-  it('keeps the current recipe when an earlier request fails after a newer one succeeds', async () => {
-    const user = userEvent.setup();
-    const generateRecipeMock = vi.mocked(generateRecipe);
-    let rejectFirst!: (reason?: unknown) => void;
-    let resolveSecond!: (value: Awaited<ReturnType<typeof generateRecipe>>) => void;
-
-    generateRecipeMock
-      .mockReturnValueOnce(new Promise((resolve, reject) => {
-        rejectFirst = reject;
-      }))
-      .mockReturnValueOnce(new Promise((resolve) => {
-        resolveSecond = resolve;
-      }));
-
-    renderPage();
-
-    await user.type(screen.getByPlaceholderText('Ej: Tomate'), ' Tomate ');
-    const quantityInput = screen.getByRole('spinbutton', { name: /cantidad/i });
-    await user.clear(quantityInput);
-    await user.type(quantityInput, '2');
-
-    const submitButton = screen.getByRole('button', { name: 'Generar receta' });
-    fireEvent.click(submitButton);
-    fireEvent.click(submitButton);
-
-    resolveSecond({
-      id: 'recipe-2',
-      title: 'Sopa de tomate reciente',
-      ingredients: [{ name: 'Tomate', quantity: 2, unit: 'unit' }],
-      instructions: ['Picar', 'Cocinar'],
-      preparationTimeMinutes: 12,
-      totalTimeMinutes: 22,
-      servings: 2,
-      difficulty: 'easy',
-      macros: {
-        calories: 240,
-        protein: 5,
-        carbohydrates: 28,
-        fats: 7,
-      },
-    });
-
-    expect(await screen.findByText('Sopa de tomate reciente')).toBeInTheDocument();
-
-    rejectFirst(new Error('No pudimos generar la receta. Intentalo nuevamente.'));
-
-    expect(screen.getByText('Sopa de tomate reciente')).toBeInTheDocument();
-    expect(screen.queryByText('No pudimos generar la receta. Intentalo nuevamente.')).not.toBeInTheDocument();
   });
 
   it('renders the editorial recipe generator layout', () => {
     renderPage();
 
     expect(screen.getByText('IA Recipe Generator')).toBeInTheDocument();
-    expect(screen.getByText('Reliable generation')).toBeInTheDocument();
-    expect(screen.getByText('Zod 4')).toBeInTheDocument();
+    expect(screen.getByText('Recetas ajustadas a tus ingredientes')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generar receta' })).toBeInTheDocument();
     expect(screen.getByText(/Todavía no hay receta generada/)).toBeInTheDocument();
+    expect(screen.queryByText('Abrir smoke test de API')).not.toBeInTheDocument();
   });
 });

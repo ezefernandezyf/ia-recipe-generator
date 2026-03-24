@@ -46,7 +46,8 @@ const buildPrompt = (request: z.infer<typeof requestSchema>): string => {
     return [
         'Genera una receta en formato JSON con este esquema:',
         '- title, ingredients, instructions, preparationTimeMinutes, totalTimeMinutes, servings, difficulty, macros',
-        '- ingredients debe respetar las unidades y cantidades provistas',
+        '- ingredients debe respetar las unidades y cantidades provistas, pero usa solo la porcion necesaria segun las porciones solicitadas',
+        '- si la cantidad ingresada es grande para pocas porciones, ajusta el uso de ingredientes a una receta realista para ese tamaño',
         '- instructions debe ser una lista de pasos claros y breves',
         '- difficulty debe ser easy, medium o hard',
         '- macros debe incluir calories, protein, carbohydrates y fats',

@@ -55,7 +55,7 @@ const IngredientForm = ({ rows, onChange }: IngredientFormProps): IngredientForm
 
     return (
         <section className="space-y-4 rounded-2xl border border-stone-200 bg-white/90 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-stone-500">Ingredientes</h2>
                     <p className="text-sm text-stone-600">Agregá ingredientes y dejá la fila nueva arriba para cargarla enseguida.</p>
