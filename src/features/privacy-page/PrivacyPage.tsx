@@ -51,7 +51,6 @@ const PrivacyPage = (): PrivacyPageView => {
           <Link className="rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" to="/">
             Volver al generador
           </Link>
-          <span className="text-sm text-stone-500">Última actualización: esta versión simple de privacidad acompaña el despliegue actual.</span>
         </div>
       </div>
     </main>
