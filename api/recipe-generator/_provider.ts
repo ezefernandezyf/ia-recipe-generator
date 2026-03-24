@@ -13,14 +13,34 @@ class MissingAiProviderError extends Error {
 const DEFAULT_GROQ_MODEL = 'openai/gpt-oss-20b';
 const DEFAULT_GOOGLE_MODEL = 'gemini-2.5-flash';
 
+const hasConfiguredValue = (value: string | undefined): value is string => {
+    return typeof value === 'string' && value.trim().length > 0;
+};
+
 const assertConfigured = (name: string, value: string | undefined) => {
-    if (typeof value !== 'string' || value.trim().length === 0) {
+    if (!hasConfiguredValue(value)) {
         throw new MissingAiProviderError(`Falta configurar ${name}.`);
     }
 };
 
 const resolveProviderName = (): AIProviderName => {
-    return process.env.AI_PROVIDER === 'google' ? 'google' : 'groq';
+    if (process.env.AI_PROVIDER === 'google') {
+        return 'google';
+    }
+
+    if (process.env.AI_PROVIDER === 'groq') {
+        return 'groq';
+    }
+
+    if (hasConfiguredValue(process.env.GROQ_API_KEY)) {
+        return 'groq';
+    }
+
+    if (hasConfiguredValue(process.env.GOOGLE_GENERATIVE_AI_API_KEY)) {
+        return 'google';
+    }
+
+    return 'groq';
 };
 
 export const isMissingAiProviderError = (error: unknown): error is MissingAiProviderError => {
